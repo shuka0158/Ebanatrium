@@ -53,6 +53,11 @@ function detect(v) {
   if (/^(bc1[a-z0-9]{25,59}|[13][a-km-zA-HJ-NP-Z1-9]{25,34})$/.test(v)) return "btc";
   if (/^[a-z]{2}-\d{3}-[a-z]{2}$/i.test(v)) return "plate";
   if (/^[A-HJ-NPR-Z0-9]{17}$/i.test(v) && /\d/.test(v) && /[a-z]/i.test(v)) return "vin";
+  // Phone with formatting: has + or spaces/dashes
+  if (/^\+?[\d\s\-().]{7,20}$/.test(v) && (v.startsWith("+") || /[\s\-()]/.test(v)) && v.replace(/\D/g, "").length >= 7) return "phone";
+  // Georgian ID: exactly 11 pure digits
+  if (/^\d{11}$/.test(v)) return "name";
+  // Plain phone: 7+ digits
   if (/^\+?[\d\s\-().]{7,20}$/.test(v) && v.replace(/\D/g, "").length >= 7) return "phone";
   if (/^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/i.test(v)) return "domain";
   if (/\s/.test(v)) return "name";

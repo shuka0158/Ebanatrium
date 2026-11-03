@@ -160,6 +160,13 @@ def detect_type(value: str) -> str:
         return "plate"
     if RE_VIN.match(v) and re.search(r"\d", v) and re.search(r"[A-Za-z]", v):
         return "vin"
+    # Phone: has + prefix or formatting chars (spaces, dashes, parens)
+    if RE_PHONE.match(v) and (v.startswith("+") or any(c in v for c in " -()")) and sum(c.isdigit() for c in v) >= 7:
+        return "phone"
+    # Georgian ID: exactly 11 pure digits (no formatting) → search as "name" to trigger all modules
+    if v.isdigit() and len(v) == 11:
+        return "name"
+    # Plain phone: 7+ digits without Georgian ID pattern
     if RE_PHONE.match(v) and sum(c.isdigit() for c in v) >= 7:
         return "phone"
     if RE_DOMAIN.match(v):
