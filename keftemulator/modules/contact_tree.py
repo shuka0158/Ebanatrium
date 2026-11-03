@@ -98,22 +98,22 @@ class ContactTreeSearch(Module):
                     ctx.emit("company", label, filename, metadata, rel="dossier")
 
                 elif ftype == 'image':
-                    # Emit images as URL type
+                    # Emit images as IMAGE_URL type (renders as actual images in sidebar!)
                     image_url = f"/api/contact-tree/image/{filename}"
                     img_data = {
                         "type": "screenshot",
                         "source": "contact_tree",
-                        "url": image_url
+                        "filename": filename
                     }
-                    ctx.emit("url", f"📸 {filename}", image_url, img_data)
+                    ctx.emit("image_url", f"📸 {filename}", image_url, img_data)
 
             # For name searches: also emit ALL images
             if ent.type == "name":
                 for doc in all_docs:
                     if doc['file_type'] == 'image':
                         image_url = f"/api/contact-tree/image/{doc['filename']}"
-                        img_data = {"type": "screenshot", "source": "contact_tree", "url": image_url}
-                        ctx.emit("url", f"📸 {doc['filename']}", image_url, img_data)
+                        img_data = {"type": "screenshot", "source": "contact_tree", "filename": doc['filename']}
+                        ctx.emit("image_url", f"📸 {doc['filename']}", image_url, img_data)
 
             conn.close()
 
