@@ -104,7 +104,10 @@ class ContactTreeSearch(Module):
                             {"type": "document", "source": "contact_tree_pdf"})
 
                 elif ftype == 'image':
-                    ctx.emit("image_url", f"📸 {filename}", filepath,
+                    # Serve image through HTTP instead of file://
+                    # Use API endpoint to serve the image
+                    image_url = f"/api/contact-tree/image/{filename}"
+                    ctx.emit("image_url", f"📸 {filename}", image_url,
                             {"type": "screenshot", "source": "contact_tree"})
 
             conn.close()

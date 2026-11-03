@@ -9,7 +9,7 @@ import time
 import uuid
 from pathlib import Path
 
-from flask import Flask, jsonify, request, render_template, send_from_directory, Response, abort
+from flask import Flask, jsonify, request, render_template, send_from_directory, send_file, Response, abort
 
 from . import db, __version__, auth, service
 from .core import Scan
@@ -34,6 +34,45 @@ def index():
 @app.route("/uploads/<path:name>")
 def uploads(name):
     return send_from_directory(UPLOADS, name)
+
+
+# ------------------------------------------------------------------ contact tree images
+@app.get("/api/contact-tree/image/<path:filename>")
+def contact_tree_image(filename):
+    """Serve images from contact tree database"""
+    from urllib.parse import unquote
+    import sqlite3
+    import os
+
+    db_path = "/home/shuka/.local/share/keftemulator/contact_tree.db"
+    if not os.path.exists(db_path):
+        abort(404)
+
+    try:
+        # Decode URL-encoded filename
+        filename = unquote(filename)
+
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+
+        cursor.execute('SELECT file_path FROM documents WHERE filename = ? AND file_type = "image"', (filename,))
+        row = cursor.fetchone()
+        conn.close()
+
+        if not row:
+            return jsonify({"error": f"Image not found: {filename}"}), 404
+
+        filepath = row['file_path']
+        if not os.path.exists(filepath):
+            return jsonify({"error": f"File not found: {filepath}"}), 404
+
+        # Serve the image file with correct MIME type
+        import mimetypes
+        mimetype = mimetypes.guess_type(filepath)[0] or 'image/png'
+        return send_file(filepath, mimetype=mimetype)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # ------------------------------------------------------------------ modules
