@@ -28,6 +28,24 @@ class ContactTreeSearch(Module):
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
 
+            # First, search individuals table
+            individuals_found = []
+            if len(q) == 11 and q.isdigit():
+                # Search by National ID
+                cursor.execute('SELECT * FROM individuals WHERE national_id = ?', (q,))
+                individuals_found = cursor.fetchall()
+            elif ent.type == "name":
+                # Search by name
+                cursor.execute('SELECT * FROM individuals WHERE name LIKE ? ORDER BY national_id LIMIT 10', (f'%{q}%',))
+                individuals_found = cursor.fetchall()
+
+            # Emit individual records if found
+            if individuals_found:
+                for ind in individuals_found:
+                    ctx.emit("info", f"👤 Individual: {ind['national_id']}",
+                            f"DOB: {ind['date_of_birth']} | Gender: {ind['gender']}",
+                            {"type": "person", "source": "contact_tree_individual", "id": ind['national_id']})
+
             # Get all documents
             cursor.execute('SELECT filename, file_type, file_path, text_content FROM documents ORDER BY filename')
             all_docs = cursor.fetchall()
