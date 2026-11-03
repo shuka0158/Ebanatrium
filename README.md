@@ -1,15 +1,34 @@
 # Keftemulator — unified OSINT platform
 
-One web GUI that combines native intelligence modules with the best open-source OSINT tools.
-You give it one identifier. It runs every matching module, then **pivots** (SpiderFoot-style) on
-each new email, username, domain, IP, phone or name it finds. Results show up as a list, a
-**link-analysis graph** (Maltego-style), and a **map**.
+🔍 **One web GUI that combines 61 OSINT modules** with the best open-source tools.
 
-## Run
+Give it one identifier (username, email, domain, IP, phone, name, company, plate, VIN, image).
+It runs every matching module, then **pivots** (SpiderFoot-style) on each new email, username, domain, IP, phone or name it finds. 
+Results show up as a **list**, an interactive **link-analysis graph** (Maltego-style), and a **map**.
+
+## Quick Start (< 5 minutes)
+
 ```bash
-./run.sh            # first run creates .venv; opens http://127.0.0.1:5050
-./install_tools.sh all   # optional: installs the external tools (no sudo), or use the Tools tab
+git clone https://github.com/shuka0158/Keftemulator.git
+cd Keftemulator
+bash setup.sh           # Interactive setup with API key prompts
+bash run.sh             # Start the app at http://127.0.0.1:5050
 ```
+
+**See [INSTALL.md](INSTALL.md) for detailed setup instructions.**
+
+## Features
+
+✅ **61 active modules** across 40+ intelligence sources  
+✅ **Georgian-focused**: NAPR registry, cadastre, tax, courts, business directory  
+✅ **Recursive pivoting**: Discover connected entities automatically  
+✅ **Interactive graph**: Visualize relationships (Cytoscape)  
+✅ **Map view**: Geolocate entities  
+✅ **Cases**: Group and merge multiple scans  
+✅ **Monitors**: Schedule scans with change alerts  
+✅ **Dark UI**: Mobile-responsive design  
+✅ **No rate limits**: Run locally, speed depends on your machine  
+✅ **All free API keys**: Optional integrations with free tiers
 
 ## What it covers
 | Target | Native modules | Wrapped tools |
