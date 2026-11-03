@@ -102,31 +102,46 @@ class ContactTreeSearch(Module):
                             {"type": "dossier", "source": "contact_tree",
                              "file_type": "pdf"})
 
-                    # Emit extracted dossier data
+                    # Emit as a company node (for better display in sidebar)
+                    data = {
+                        "type": "dossier",
+                        "source": "contact_tree",
+                        "file_type": "pdf",
+                        "file": filepath
+                    }
+
                     if ids:
-                        ctx.emit("info", f"🆔 ID", ids[0],
+                        data["id"] = ids[0]
+                    if name_match:
+                        data["name"] = name_match.group(1).strip()
+                    if gender_match:
+                        data["gender"] = gender_match.group(1).strip()
+                    if dob_match:
+                        data["dob"] = dob_match.group(1).strip()
+
+                    # Emit as company node with full data
+                    ctx.emit("company", label, label, data, rel="dossier")
+
+                    # Also emit extracted fields as info nodes
+                    if ids:
+                        ctx.emit("info", f"🆔 {label}", ids[0],
                                 {"type": "id", "source": "contact_tree_pdf"})
                     if name_match:
-                        ctx.emit("info", f"👤 Name", name_match.group(1).strip(),
+                        ctx.emit("info", f"👤 {label}", name_match.group(1).strip(),
                                 {"type": "name", "source": "contact_tree_pdf"})
                     if gender_match:
-                        ctx.emit("info", f"⚧ Gender", gender_match.group(1).strip(),
+                        ctx.emit("info", f"⚧ {label}", gender_match.group(1).strip(),
                                 {"type": "gender", "source": "contact_tree_pdf"})
                     if dob_match:
-                        ctx.emit("info", f"📅 DOB", dob_match.group(1).strip(),
+                        ctx.emit("info", f"📅 {label}", dob_match.group(1).strip(),
                                 {"type": "date_of_birth", "source": "contact_tree_pdf"})
 
-                    # Emit content preview
-                    preview = content[:300].replace('\n', ' ')
-                    ctx.emit("info", f"📋 Dossier", preview,
-                            {"type": "document", "source": "contact_tree_pdf"})
-
                 elif ftype == 'image':
-                    # Serve image through HTTP instead of file://
-                    # Use API endpoint to serve the image
+                    # Serve image through HTTP
                     image_url = f"/api/contact-tree/image/{filename}"
-                    ctx.emit("image_url", f"📸 {filename}", image_url,
-                            {"type": "screenshot", "source": "contact_tree"})
+                    # Emit as image type so it displays in sidebar
+                    ctx.emit("image", f"📸 {filename}", image_url,
+                            {"type": "screenshot", "source": "contact_tree", "url": image_url})
 
             conn.close()
 
