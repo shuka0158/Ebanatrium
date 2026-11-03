@@ -13,6 +13,8 @@ class ContactTreeSearch(Module):
 
     DB_PATH = "/home/shuka/.local/share/keftemulator/contact_tree.db"
 
+    default = True  # Run by default to show Contact Tree always
+
     def run(self, ent, ctx):
         if not os.path.exists(self.DB_PATH):
             ctx.log("Contact tree database not found", "warn")
@@ -53,6 +55,11 @@ class ContactTreeSearch(Module):
                 ctx.log(f"showing {len(matched)} contact tree documents", "info")
             elif matched:
                 ctx.log(f"found {len(matched)} matches", "info")
+
+            # Emit section header
+            ctx.emit("person", f"📂 CONTACT TREE DATABASE",
+                    f"Local database with {len(all_docs)} documents",
+                    {"type": "section_header", "source": "contact_tree", "priority": "high"})
 
             # Emit results
             for row in matched:

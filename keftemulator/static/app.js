@@ -16,8 +16,9 @@ const COLORS = {
   vin:"#a5d6ff", plate:"#a5d6ff", btc:"#f7931a", eth:"#8a92b2", breach:"#ff5f5f", vuln:"#ff5f5f",
   port:"#9da5b4", profile:"#ff7eb6", device:"#c9d1d9", info:"#8b949e", url:"#79b8ff",
   company:"#ffd166", screenshot:"#9ecbff", leak:"#ff5f5f", case:"#ffd166",
+  contact_tree:"#6366f1", section_header:"#6366f1",
 };
-const ORDER = ["profile","name","company","account","email","username","phone","location","face","device","breach",
+const ORDER = ["section_header","contact_tree","profile","name","company","account","email","username","phone","location","face","device","breach",
   "leak","screenshot","domain","ip","port","vuln","btc","eth","vin","plate","image","image_url","url","info","link"];
 const col = t => COLORS[t] || "#8b949e";
 
