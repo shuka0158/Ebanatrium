@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# Keftemulator service control.
+#   keft on | off | restart | status | url | logs
+#   keft password [NEW]     set login password (random if omitted)
+#   keft boot on|off        start automatically at boot (even when logged out)
+set -uo pipefail
+ROOT="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+APP=keftemulator.service; TUN=keftemulator-tunnel.service
+sc() { systemctl --user "$@"; }
+
+public_url() {
+  tailscale status --json 2>/dev/null |
+    python3 -c "import json,sys;d=json.load(sys.stdin)['Self']['DNSName'].rstrip('.');print('https://'+d if d else '')" 2>/dev/null
+}
+
+
+case "${1:-status}" in
+  on|start)
+    [ -f "$ROOT/data/auth.json" ] || { echo "Set a password first:"; "$0" password; }
+    command -v tailscale >/dev/null || { echo "tailscale is not installed (see README → Public hosting)"; exit 1; }
+    sc start $APP $TUN
+    sleep 2
+    sc is-active --quiet $TUN || { echo "tunnel failed:"; journalctl --user -u $TUN -n 8 --no-pager -o cat; exit 1; }
+    u=$(public_url)
+    echo "● Keftemulator is ON"
+    echo "  local : http://127.0.0.1:5050"
+    echo "  public: ${u:-tunnel not up yet — run: keft logs}" ;;
+  off|stop)
+    sc stop $TUN $APP; echo "○ Keftemulator is OFF (no longer reachable)" ;;
+  restart)
+    sc restart $APP $TUN; sleep 2; "$0" status ;;
+  status)
+    a=$(sc is-active $APP); t=$(sc is-active $TUN)
+    echo "app   : $a"; echo "tunnel: $t"
+    [ "$t" = active ] && echo "url   : $(public_url)"
+    command -v tailscale >/dev/null || echo "note  : tailscale not installed — see README (Public hosting)"
+    echo "boot  : $(sc is-enabled $APP 2>/dev/null)" ;;
+  url) public_url ;;
+  logs) journalctl --user -u $APP -u $TUN -n 60 --no-pager ;;
+  password)
+    pw=$("$ROOT/.venv/bin/python" -m keftemulator.auth set-password ${2:+"$2"})
+    echo "Login password: $pw"
+    echo "(all existing sessions were logged out)"
+    sc is-active --quiet $APP && sc restart $APP ;;
+  boot)
+    case "${2:-}" in
+      on)  sc enable $APP $TUN
+           loginctl enable-linger "$USER" 2>/dev/null || echo "(to also run while logged out: sudo loginctl enable-linger $USER)"
+           echo "Starts automatically at boot." ;;
+      off) sc disable $APP $TUN; echo "Will not start at boot." ;;
+      *) echo "usage: keft boot on|off" ;;
+    esac ;;
+  *) sed -n '2,7p' "$0" ;;
+esac

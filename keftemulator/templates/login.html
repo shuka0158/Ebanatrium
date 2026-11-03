@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keftemulator · Sign in</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+<style>
+  body{align-items:center;justify-content:center;overflow:auto}
+  .box{width:100%;max-width:360px;padding:16px}
+  .brand{margin-bottom:28px;font-size:17px}
+  .err{color:var(--err);font-size:13px;margin-top:10px}
+</style>
+</head>
+<body>
+  <form class="box" method="post">
+    <div class="brand"><span class="logo">◉</span> KEFTEMULATOR</div>
+    {% if configured %}
+      <label class="lbl" for="pw">Password</label>
+      <input id="pw" type="password" name="password" autofocus autocomplete="current-password">
+      <button class="primary big" type="submit">Sign in</button>
+      {% if error %}<div class="err">{{ error }}</div>{% endif %}
+    {% else %}
+      <p class="muted">No password set. On the host machine run <code>keft password</code>.</p>
+    {% endif %}
+  </form>
+</body>
+</html>

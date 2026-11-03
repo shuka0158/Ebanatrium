@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Keftemulator Guide</title>
+<style>
+body { font-family: "IBM Plex Sans", sans-serif; background: #0a0e27; color: #e0e0e0; margin: 0; padding: 0; }
+.guide-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 10000; }
+.guide-modal.open { display: flex; align-items: center; justify-content: center; }
+.guide-content { background: #151b32; border: 1px solid #333; border-radius: 8px; width: 90%; max-width: 900px; max-height: 85vh; overflow-y: auto; padding: 0; }
+.guide-header { position: sticky; top: 0; background: #0f1624; padding: 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+.guide-header h1 { margin: 0; font-size: 24px; }
+.guide-close { background: #333; border: none; color: #fff; font-size: 24px; cursor: pointer; width: 40px; height: 40px; border-radius: 4px; }
+.guide-close:hover { background: #555; }
+.guide-body { padding: 20px; }
+.section { margin-bottom: 30px; }
+.section h2 { color: #00d4ff; font-size: 18px; margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; }
+.section h3 { color: #b0b0b0; font-size: 14px; margin-top: 15px; }
+.section p, .section ul { line-height: 1.6; font-size: 13px; }
+.section ul { margin: 10px 0; padding-left: 20px; }
+.section li { margin: 5px 0; }
+.code-block { background: #0a0e27; border-left: 3px solid #00d4ff; padding: 10px; margin: 10px 0; font-family: "Courier New", monospace; font-size: 12px; overflow-x: auto; }
+.tip { background: #1a2847; border-left: 3px solid #ffa500; padding: 10px; margin: 10px 0; font-size: 12px; }
+.warning { background: #472a2a; border-left: 3px solid #ff6b6b; padding: 10px; margin: 10px 0; font-size: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 10px 0; }
+table th, table td { border: 1px solid #333; padding: 8px; text-align: left; }
+table th { background: #0f1624; color: #00d4ff; }
+.module-badge { display: inline-block; background: #00d4ff; color: #0a0e27; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: bold; margin-right: 5px; }
+.workflow { background: #0f1624; border: 1px dashed #333; padding: 15px; margin: 15px 0; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="guide-modal" id="guideModal">
+  <div class="guide-content">
+    <div class="guide-header">
+      <h1>Keftemulator User Guide</h1>
+      <button class="guide-close" onclick="document.getElementById('guideModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="guide-body">
+
+      <!-- OVERVIEW -->
+      <div class="section">
+        <h2>📋 Overview</h2>
+        <p><strong>Keftemulator</strong> is a comprehensive OSINT (Open Source Intelligence) platform that aggregates data from 40+ public sources including usernames, emails, domains, IPs, phone numbers, Georgian business registry, court documents, and more. It combines SpiderFoot-style recursive pivoting with a beautiful graph interface and map visualization.</p>
+        <p><strong>Key Features:</strong></p>
+        <ul>
+          <li>Recursive entity discovery with depth control (0-5 levels)</li>
+          <li>Visual graph of relationships between entities</li>
+          <li>Map view for geographic data</li>
+          <li>Case management for grouping related scans</li>
+          <li>Monitors for scheduled searches with change notifications</li>
+          <li>40+ integrated data sources including Georgian registries</li>
+        </ul>
+      </div>
+
+      <!-- QUICK START -->
+      <div class="section">
+        <h2>🚀 Quick Start</h2>
+        <div class="workflow">
+          <strong>1. Start a Scan</strong><br>
+          Enter a target (username, email, domain, IP, phone, name, company) → Select depth (0-5) → Choose modules → Click "Scan"
+          <br><br>
+          <strong>2. Explore Results</strong><br>
+          Graph shows all discovered entities and relationships. Click nodes to see details. Map displays geographic data.
+          <br><br>
+          <strong>3. Create Cases</strong><br>
+          Group multiple scans together. Cases merge and deduplicate findings across scans.
+          <br><br>
+          <strong>4. Monitor Changes</strong><br>
+          Set up monitors to run scans on a schedule and get notified of new findings via ntfy.sh.
+        </div>
+      </div>
+
+      <!-- TARGET TYPES -->
+      <div class="section">
+        <h2>🎯 Target Types</h2>
+        <table>
+          <tr>
+            <th>Type</th>
+            <th>Example</th>
+            <th>What It Finds</th>
+          </tr>
+          <tr>
+            <td><strong>username</strong></td>
+            <td>john_doe, @github_user</td>
+            <td>Social profiles, account history, linked emails/names</td>
+          </tr>
+          <tr>
+            <td><strong>email</strong></td>
+            <td>user@example.com</td>
+            <td>Breaches, related accounts, domain data, registration history</td>
+          </tr>
+          <tr>
+            <td><strong>domain</strong></td>
+            <td>example.com</td>
+            <td>DNS records, IP address, certificates, subdomains, website history</td>
+          </tr>
+          <tr>
+            <td><strong>IP</strong></td>
+            <td>192.168.1.1</td>
+            <td>Host info, reverse DNS, services, geolocation, cohosted domains</td>
+          </tr>
+          <tr>
+            <td><strong>phone</strong></td>
+            <td>+995 555 123456</td>
+            <td>Phone lookup (Georgia), carrier info, related searches</td>
+          </tr>
+          <tr>
+            <td><strong>name</strong></td>
+            <td>John Doe</td>
+            <td>NAPR registry matches, Wikidata, social media</td>
+          </tr>
+          <tr>
+            <td><strong>company</strong></td>
+            <td>OOO Acme Corp, GE:123456789</td>
+            <td>Georgian NAPR registry, court documents, related persons</td>
+          </tr>
+          <tr>
+            <td><strong>VIN</strong></td>
+            <td>WBADT43452G297186</td>
+            <td>Vehicle details, recalls, history</td>
+          </tr>
+          <tr>
+            <td><strong>plate</strong></td>
+            <td>AB-123-CD (Georgian)</td>
+            <td>Vehicle photos (Platesmania), plate searches, Google Images</td>
+          </tr>
+          <tr>
+            <td><strong>image</strong></td>
+            <td>JPG/PNG file</td>
+            <td>EXIF data, GPS, reverse image search links</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- MODULES -->
+      <div class="section">
+        <h2>🔧 Modules (40+ Data Sources)</h2>
+
+        <h3><span class="module-badge">Username</span> Social Profiles</h3>
+        <p>Searches for usernames across 50+ sites: GitHub, Reddit, LinkedIn, Twitter, Instagram, Discord, Telegram, etc. Includes Sherlock and Maigret for comprehensive site checking.</p>
+
+        <h3><span class="module-badge">Email</span> Breach & Account Data</h3>
+        <p>Checks breaches (HIBP, FreeBreaches), related accounts, domain lookups, and email validation.</p>
+
+        <h3><span class="module-badge">Domain</span> Web Infrastructure</h3>
+        <p>DNS records, certificate transparency (crt.sh), Wayback Machine, IP hosting data, CDN detection, website snapshots.</p>
+
+        <h3><span class="module-badge">IP</span> Network Reconnaissance</h3>
+        <p>Geolocation, reverse DNS, port scanning (Shodan, InternetDB), abuse reports, cohosted domains.</p>
+
+        <h3><span class="module-badge">Phone</span> Telecommunications</h3>
+        <p>Carrier lookup, Georgian phone searches (nomrebi.com), PhoneInfoga, Wikidata links.</p>
+
+        <h3><span class="module-badge">Georgia</span> Local Records</h3>
+        <p><strong>NAPR:</strong> Georgian business registry with company details, court documents, directors.<br>
+        <strong>Court:</strong> Georgian court case database.<br>
+        <strong>Plates:</strong> Vehicle photos from Platesmania, Georgian plate searches.<br>
+        <strong>Telegram:</strong> Public Telegram profiles, channels, member counts.</p>
+
+        <h3><span class="module-badge">Image</span> Photo Analysis</h3>
+        <p>EXIF data extraction, GPS coordinates, file hashes, reverse image search links (Google, Yandex, TinEye).</p>
+
+        <h3><span class="module-badge">Other</span> Specialized Searches</h3>
+        <p>Wikidata person search, VIN decoder, crypto addresses, GitHub deep dive, account enrichment, URLScan, Dark web links (Ahmia).</p>
+      </div>
+
+      <!-- DEPTH & PIVOTING -->
+      <div class="section">
+        <h2>📊 Depth & Pivoting</h2>
+        <p><strong>Depth</strong> controls how many recursive levels of discovery Keftemulator performs:</p>
+        <table>
+          <tr>
+            <th>Depth</th>
+            <th>Description</th>
+            <th>Use Case</th>
+          </tr>
+          <tr>
+            <td>0</td>
+            <td>Only direct lookups on the target (no pivoting)</td>
+            <td>Quick checks, single entity details</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>Direct target + discovered entities</td>
+            <td>Standard investigation, 5-20 min</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Up to 2 levels of recursion</td>
+            <td>Deep investigation, 10-30 min</td>
+          </tr>
+          <tr>
+            <td>3+</td>
+            <td>Deep recursive search</td>
+            <td>Complex networks, may hit rate limits, 30+ min</td>
+          </tr>
+        </table>
+        <div class="tip">💡 <strong>Tip:</strong> Start with depth 1 for faster results. Increase depth if you need to discover hidden connections.</div>
+      </div>
+
+      <!-- SCAN INTERFACE -->
+      <div class="section">
+        <h2>🔍 Running a Scan</h2>
+        <h3>Step 1: Enter Target</h3>
+        <p>Type the target in the search box. Keftemulator auto-detects the type (email, domain, IP, etc.). You can also manually specify the type.</p>
+
+        <h3>Step 2: Choose Depth</h3>
+        <p>Default is 1. Use 0 for quick checks, 2+ for deeper investigation. Higher depths take longer and may trigger rate limits.</p>
+
+        <h3>Step 3: Select Modules</h3>
+        <p>By default, all available modules run. Click "Select Modules" to customize which sources to query.</p>
+
+        <h3>Step 4: Click Scan</h3>
+        <p>The scan starts immediately. You'll see a live entity counter. The graph updates in real-time.</p>
+
+        <h3>During Scan</h3>
+        <ul>
+          <li>Graph shows discovered entities and edges</li>
+          <li>Results list shows new findings as they arrive</li>
+          <li>Logs tab shows module activity and errors</li>
+          <li>Click "Stop" to halt the scan (you can resume later with Cases)</li>
+        </ul>
+      </div>
+
+      <!-- GRAPH VIEW -->
+      <div class="section">
+        <h2>📈 Graph View</h2>
+        <p>The graph shows all discovered entities as nodes and relationships as edges.</p>
+        <h3>Node Types & Colors</h3>
+        <ul>
+          <li><strong style="color: #00d4ff;">Blue:</strong> Usernames, accounts</li>
+          <li><strong style="color: #00ff88;">Green:</strong> Domains, IPs, networks</li>
+          <li><strong style="color: #ff6b9d;">Pink:</strong> Emails, breach data</li>
+          <li><strong style="color: #ffa500;">Orange:</strong> Companies, organizations</li>
+          <li><strong style="color: #9d4edd;">Purple:</strong> Images, files</li>
+          <li><strong style="color: #ffbe0b;">Yellow:</strong> Phone numbers, names</li>
+        </ul>
+        <h3>Interactions</h3>
+        <ul>
+          <li><strong>Click node:</strong> See details, related data, links</li>
+          <li><strong>Drag nodes:</strong> Reposition graph</li>
+          <li><strong>Scroll/pinch:</strong> Zoom in/out</li>
+          <li><strong>Search results list:</strong> Click result to highlight node in graph</li>
+        </ul>
+      </div>
+
+      <!-- MAP VIEW -->
+      <div class="section">
+        <h2>🗺️ Map View</h2>
+        <p>Displays geographic data: IP locations, DNS records, VPN detection, server locations.</p>
+        <ul>
+          <li>Click map marker to see details</li>
+          <li>Zoom to explore regions</li>
+          <li>Markers show IP geolocation, ISP, and confidence</li>
+        </ul>
+      </div>
+
+      <!-- CASES -->
+      <div class="section">
+        <h2>📁 Cases</h2>
+        <p>Group multiple scans together for complex investigations involving multiple targets.</p>
+        <h3>Create a Case</h3>
+        <ul>
+          <li>During or after a scan, click "Add to Case"</li>
+          <li>Enter case name (e.g., "Investigation: Company XYZ")</li>
+          <li>Add multiple scans to the same case</li>
+        </ul>
+        <h3>Case View</h3>
+        <ul>
+          <li>Cases tab shows all your cases</li>
+          <li>Click a case to view merged results</li>
+          <li>Entities are deduplicated across scans</li>
+          <li>Add notes to track findings</li>
+          <li>Export as JSON, CSV, or HTML report</li>
+        </ul>
+      </div>
+
+      <!-- MONITORS -->
+      <div class="section">
+        <h2>⏱️ Monitors (Scheduled Scans)</h2>
+        <p>Automatically run scans on a schedule and get notified when new findings appear.</p>
+        <h3>Create a Monitor</h3>
+        <ul>
+          <li>Click Monitors tab → "New Monitor"</li>
+          <li>Enter target (username, company, etc.)</li>
+          <li>Set interval (hours): 1, 6, 24, etc.</li>
+          <li>Select modules to run</li>
+          <li>Optionally assign to a Case</li>
+        </ul>
+        <h3>Notifications</h3>
+        <ul>
+          <li>Set ntfy.sh topic in Settings for push notifications</li>
+          <li>Receive alerts when new entities are discovered</li>
+          <li>View monitor event history</li>
+        </ul>
+        <div class="tip">💡 <strong>Tip:</strong> Use monitors to track companies, usernames, or domains over time. Catch new website mentions, leaked credentials, or domain changes.</div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="section">
+        <h2>⚙️ Settings</h2>
+        <h3>API Keys</h3>
+        <p>Add API keys for enhanced functionality:</p>
+        <ul>
+          <li><strong>Shodan:</strong> IP/port scanning, device intelligence</li>
+          <li><strong>VirusTotal:</strong> File/URL reputation, domain/IP analysis</li>
+          <li><strong>Hunter.io:</strong> Email finding and verification</li>
+          <li><strong>HIBP:</strong> Breach database (free tier available)</li>
+          <li><strong>GitHub Token:</strong> Higher rate limits, private repo scanning</li>
+          <li><strong>NumVerify:</strong> Phone number validation</li>
+          <li><strong>AbuseIPDB:</strong> IP abuse reports</li>
+          <li><strong>CARTO:</strong> Map tiles API key</li>
+          <li><strong>IntelX:</strong> Intelligence database search</li>
+          <li><strong>URLScan:</strong> Higher rate limits for URL scanning</li>
+          <li><strong>ntfy.sh topic:</strong> Enter your ntfy.sh topic for monitor notifications</li>
+        </ul>
+        <h3>Advanced Settings</h3>
+        <ul>
+          <li><strong>Max Depth:</strong> Default recursion depth (0-5)</li>
+          <li><strong>Max Entities:</strong> Stop scan after discovering N entities (default 400)</li>
+          <li><strong>Threads:</strong> Concurrent module workers (default 8)</li>
+          <li><strong>Tool Timeout:</strong> Max seconds per tool execution (default 600)</li>
+        </ul>
+      </div>
+
+      <!-- TOOLS -->
+      <div class="section">
+        <h2>🛠️ Tools Management</h2>
+        <p>External tools required by some modules:</p>
+        <ul>
+          <li><strong>Sherlock/Maigret:</strong> Username search across 50+ sites</li>
+          <li><strong>TheHarvester:</strong> Email and subdomain enumeration</li>
+          <li><strong>PhoneInfoga:</strong> Phone number OSINT</li>
+          <li><strong>ExifTool:</strong> Image metadata extraction</li>
+          <li><strong>SpiderFoot:</strong> Full-featured OSINT framework</li>
+          <li><strong>Recon-ng:</strong> Certificate and DNS reconnaissance</li>
+        </ul>
+        <p>Click "Install All Missing" in Settings to auto-install missing tools.</p>
+      </div>
+
+      <!-- GEORGIAN FEATURES -->
+      <div class="section">
+        <h2>🇬🇪 Georgian-Specific Features</h2>
+        <ul>
+          <li><strong>NAPR Registry:</strong> Search Georgian companies by name or ID code (9-digit code or 11-digit personal number)</li>
+          <li><strong>Court Documents:</strong> Georgian court case database search</li>
+          <li><strong>Georgian Plates:</strong> Vehicle photos from Platesmania, plate format: AB-123-CD</li>
+          <li><strong>Georgian Phone:</strong> Phone lookups via nomrebi.com, Google searches over various formats</li>
+          <li><strong>Georgian Locations:</strong> Links to real estate, jobs, market sites (.ge domains)</li>
+        </ul>
+        <div class="tip">💡 Georgian names are auto-transliterated from Latin to Georgian for registry searches.</div>
+      </div>
+
+      <!-- TIPS & BEST PRACTICES -->
+      <div class="section">
+        <h2>💡 Tips & Best Practices</h2>
+        <ul>
+          <li><strong>Start Small:</strong> Begin with depth 1 and expand if needed. Higher depths take longer and may hit rate limits.</li>
+          <li><strong>Use Cases:</strong> Group related scans in Cases for easier analysis and deduplication.</li>
+          <li><strong>Check Logs:</strong> Click "Logs" tab to see what each module found and any errors.</li>
+          <li><strong>Export Results:</strong> Export scans/cases as JSON (structured data), CSV (spreadsheet), or HTML (report).</li>
+          <li><strong>API Keys:</strong> Add keys for better coverage. Free tiers work but have rate limits.</li>
+          <li><strong>Monitor Targets:</strong> Use monitors to track high-interest targets over time.</li>
+          <li><strong>Respect robots.txt:</strong> Keftemulator respects robots.txt and rate limits.</li>
+          <li><strong>Legal Use Only:</strong> Use Keftemulator for authorized investigations, security research, and OSINT. Respect local laws and data protection regulations.</li>
+        </ul>
+      </div>
+
+      <!-- LEGAL & ETHICS -->
+      <div class="section">
+        <h2>⚖️ Legal & Ethical Guidelines</h2>
+        <div class="warning">⚠️ <strong>Important:</strong> Keftemulator is designed for authorized OSINT research, security investigations, and pentesting within legal boundaries.</div>
+        <ul>
+          <li><strong>Only search public data:</strong> No scraping private profiles, bypassing authentication, or accessing non-public APIs.</li>
+          <li><strong>Respect robots.txt:</strong> All web crawling respects website guidelines.</li>
+          <li><strong>No biometric identification:</strong> Face recognition and mass identity linking are not supported.</li>
+          <li><strong>Comply with local law:</strong> Data protection laws vary by jurisdiction. Use Keftemulator responsibly.</li>
+          <li><strong>Authorized access only:</strong> Only investigate targets you have authorization to research.</li>
+          <li><strong>Respect privacy:</strong> Don't publish or misuse personal information discovered during OSINT.</li>
+        </ul>
+      </div>
+
+      <!-- TROUBLESHOOTING -->
+      <div class="section">
+        <h2>🔧 Troubleshooting</h2>
+        <h3>Scan stops or finds few results</h3>
+        <ul>
+          <li>Check API key configuration in Settings</li>
+          <li>Some modules require API keys to work</li>
+          <li>Verify internet connection</li>
+          <li>Check logs for rate-limit or timeout errors</li>
+        </h3>
+        <h3>Graph is empty or slow</h3>
+        <ul>
+          <li>Reduce depth to 0-1 for faster results</li>
+          <li>Lower Max Entities limit in Settings</li>
+          <li>Try a simpler search target (single username rather than complex data)</li>
+        </ul>
+        <h3>Modules show as unavailable</h3>
+        <ul>
+          <li>Click "Install All Missing" in Settings</li>
+          <li>Some modules require external tools (Sherlock, ExifTool, etc.)</li>
+          <li>Check Settings → Tools for installation status</li>
+        </ul>
+        <h3>No notifications from monitors</h3>
+        <ul>
+          <li>Enter ntfy.sh topic in Settings</li>
+          <li>Click "Test Notification" to verify setup</li>
+          <li>Monitors run on a schedule (check interval in case details)</li>
+        </ul>
+      </div>
+
+      <!-- EXAMPLES -->
+      <div class="section">
+        <h2>📚 Example Investigations</h2>
+        <h3>Example 1: Username Investigation</h3>
+        <div class="workflow">
+          <strong>Target:</strong> john_doe<br>
+          <strong>Depth:</strong> 1<br>
+          <strong>Result:</strong> Finds accounts across 50+ sites, email addresses, related names, breach history.
+        </div>
+
+        <h3>Example 2: Company Background Check</h3>
+        <div class="workflow">
+          <strong>Target:</strong> OOO Acme Corp (or GE:123456789 for Georgian)<br>
+          <strong>Depth:</strong> 1<br>
+          <strong>Result:</strong> NAPR registry info, court records, directors, website, IP, related domains.
+        </div>
+
+        <h3>Example 3: Vehicle Investigation</h3>
+        <div class="workflow">
+          <strong>Target:</strong> AB-123-CD (Georgian plate)<br>
+          <strong>Depth:</strong> 0<br>
+          <strong>Result:</strong> Photos from Platesmania, Google Images, related searches, plate history.
+        </div>
+
+        <h3>Example 4: Phone Number Research</h3>
+        <div class="workflow">
+          <strong>Target:</strong> +995 555 123456<br>
+          <strong>Depth:</strong> 1<br>
+          <strong>Result:</strong> Carrier info, Georgian searches (nomrebi.com), related social media, breach mentions.
+        </div>
+      </div>
+
+      <!-- SUPPORT -->
+      <div class="section">
+        <h2>❓ Support & Feedback</h2>
+        <p>Keftemulator is an open-source OSINT platform. For issues, features, or feedback, check the project documentation.</p>
+        <p>Use responsibly and always comply with local laws and platform terms of service.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function openGuide() {
+  document.getElementById('guideModal').classList.add('open');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.getElementById('guideModal').classList.remove('open');
+  }
+});
+
+document.getElementById('guideModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    this.classList.remove('open');
+  }
+});
+</script>
+</body>
+</html>

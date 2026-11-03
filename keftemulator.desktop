@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Keftemulator OSINT
+Exec=/home/shuka/Desktop/Keftemulator/run.sh
+Path=/home/shuka/Desktop/Keftemulator
+Icon=system-search
+Terminal=true
+Categories=Network;Security;

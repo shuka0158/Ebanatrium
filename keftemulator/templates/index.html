@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keftemulator OSINT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body data-carto="{{ carto_key }}">
+<header class="top">
+  <div class="brand"><span class="logo">◉</span> KEFTEMULATOR <small>v{{ version }}</small></div>
+  <nav>
+    <button class="nav active" data-page="investigate">Investigate</button>
+    <button class="nav" data-page="scans">Scans</button>
+    <button class="nav" data-page="cases">Cases</button>
+    <button class="nav" data-page="monitors">Monitors <span id="monBadge" class="badge hidden"></span></button>
+    <button class="nav" data-page="modules">Modules</button>
+    <button class="nav" data-page="tools">Tools</button>
+    <button class="nav" data-page="settings">Settings</button>
+    <button class="nav" id="helpBtn" title="Open user guide" style="font-weight: bold; font-size: 16px;">?</button>
+    <a class="nav" href="/logout">Log out</a>
+  </nav>
+</header>
+
+<!-- ===================================================== INVESTIGATE -->
+<main id="page-investigate" class="page active">
+  <aside class="side">
+    <form id="scanForm">
+      <label class="lbl">Target</label>
+      <input id="target" placeholder="username, email, domain, IP, +phone, full name, VIN, plate, BTC…" autocomplete="off">
+      <div id="detected" class="hint">Type auto-detected as you type</div>
+
+      <div id="dropzone" class="drop hidden">
+        <input type="file" id="imageFile" accept="image/*">
+        <div>Drop a photo here or <u>browse</u><br><small>EXIF · GPS · faces · reverse search</small></div>
+        <img id="imgPreview" class="hidden" alt="">
+      </div>
+
+      <div class="row2">
+        <div>
+          <label class="lbl">Type</label>
+          <select id="ttype"></select>
+        </div>
+        <div>
+          <label class="lbl">Pivot depth <b id="depthVal">3</b></label>
+          <input type="range" id="depth" min="0" max="3" value="3">
+        </div>
+      </div>
+
+      <label class="lbl" for="caseSel">Case</label>
+      <select id="caseSel"><option value="">No case</option></select>
+
+      <div class="presets">
+        <span class="lbl">Modules</span>
+        <button type="button" data-preset="fast">Fast</button>
+        <button type="button" data-preset="default">Default</button>
+        <button type="button" data-preset="all">All</button>
+        <button type="button" data-preset="none">None</button>
+      </div>
+      <div id="moduleList" class="modlist"></div>
+      <button class="primary big" type="submit" id="runBtn">Run investigation</button>
+    </form>
+  </aside>
+
+  <section class="work">
+    <div id="empty" class="empty">
+      <h2>Start with one identifier.</h2>
+      <p>Keftemulator fans it out across native modules and the tools you have installed
+        (Sherlock, Maigret, holehe, theHarvester, PhoneInfoga, ExifTool, SpiderFoot, Recon-ng),
+        then pivots on every new email, username, domain, IP, phone and name it finds.</p>
+      <div class="examples">
+        <button data-ex="torvalds">torvalds</button>
+        <button data-ex="example.com">example.com</button>
+        <button data-ex="8.8.8.8">8.8.8.8</button>
+        <button data-ex="+995 32 2 00 00 00">+995 32 2 00 00 00</button>
+        <button data-ex="1HGCM82633A004352">1HGCM82633A004352</button>
+        <button data-ex="Ada Lovelace">Ada Lovelace</button>
+      </div>
+    </div>
+
+    <div id="scanView" class="hidden">
+      <div class="scanhead">
+        <div>
+          <div class="target"><span id="shType" class="tag"></span> <span id="shTarget"></span></div>
+          <div class="meta"><span id="shStatus" class="status"></span> · <span id="shCount">0</span> entities ·
+            <span id="shTime"></span></div>
+        </div>
+        <div class="actions">
+          <button id="stopBtn" class="danger">Stop</button>
+          <button id="caseBtn" title="Group this scan with others about the same subject">Add to case</button>
+          <button id="monBtn" title="Re-run on a schedule and alert on new findings">Monitor</button>
+          <a id="exJson" class="btn">JSON</a><a id="exCsv" class="btn">CSV</a><a id="exHtml" class="btn">Report</a>
+        </div>
+      </div>
+      <div id="caseScans" class="stats hidden"></div>
+      <div id="stats" class="stats"></div>
+      <div class="tabs">
+        <button class="tab active" data-view="results">Results</button>
+        <button class="tab" data-view="graph">Graph</button>
+        <button class="tab" data-view="map">Map</button>
+        <button class="tab" data-view="log">Log</button>
+        <button class="tab" data-view="notes">Notes</button>
+        <input id="filter" placeholder="Filter results…">
+      </div>
+      <div class="views">
+        <div id="view-results" class="view active"><div id="embeds"></div><div id="resultList"></div></div>
+        <div id="view-graph" class="view"><div id="cy"></div>
+          <div class="graphbar"><button id="fitBtn">Fit</button><button id="layoutBtn">Re-layout</button>
+            <label><input type="checkbox" id="hideLinks" checked> hide search links</label></div></div>
+        <div id="view-map" class="view"><div id="map"></div></div>
+        <div id="view-log" class="view"><pre id="log"></pre></div>
+        <div id="view-notes" class="view"><textarea id="notes" placeholder="Analyst notes (saved with the scan, included in the report)"></textarea></div>
+      </div>
+    </div>
+  </section>
+
+  <aside id="detail" class="detail hidden">
+    <button class="close" id="closeDetail" aria-label="Close">×</button>
+    <div id="detailBody"></div>
+  </aside>
+</main>
+
+<!-- ===================================================== SCANS -->
+<main id="page-scans" class="page">
+  <div class="pagewrap">
+    <h2>Scan history</h2>
+    <table class="tbl"><thead><tr><th>#</th><th>Target</th><th>Type</th><th>Status</th><th>Entities</th><th>Started</th><th></th></tr></thead>
+      <tbody id="scanRows"></tbody></table>
+  </div>
+</main>
+
+<!-- ===================================================== CASES -->
+<main id="page-cases" class="page">
+  <div class="pagewrap">
+    <div class="pagehead"><h2>Cases</h2><button class="primary" id="newCaseBtn">New case</button></div>
+    <p class="muted">A case merges every scan about one subject into a single graph, map and report.
+      Pick the case in the sidebar before running a scan, or use “Add to case” on an existing scan.</p>
+    <table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Scans</th><th>Created</th><th></th></tr></thead>
+      <tbody id="caseRows"></tbody></table>
+  </div>
+</main>
+
+<!-- ===================================================== MONITORS -->
+<main id="page-monitors" class="page">
+  <div class="pagewrap">
+    <h2>Monitors</h2>
+    <p class="muted">Monitors re-run a scan on a schedule and record anything new (accounts, breaches, subdomains,
+      emails…). Set an ntfy topic in Settings to get a push notification on your phone.</p>
+    <table class="tbl"><thead><tr><th>Target</th><th>Interval</th><th>Last run</th><th>Last result</th><th></th></tr></thead>
+      <tbody id="monRows"></tbody></table>
+  </div>
+</main>
+
+<!-- ===================================================== MODULES -->
+<main id="page-modules" class="page">
+  <div class="pagewrap"><h2>Modules</h2><div id="modCards" class="cards"></div></div>
+</main>
+
+<!-- ===================================================== TOOLS -->
+<main id="page-tools" class="page">
+  <div class="pagewrap">
+    <h2>External tools</h2>
+    <p class="muted">Installed into <code>./tools</code> and <code>~/.local/bin</code> (pipx). No root needed.</p>
+    <div id="toolRows" class="tools"></div>
+    <button class="primary" id="installAll">Install all missing</button>
+    <pre id="installLog" class="termlog"></pre>
+  </div>
+</main>
+
+<!-- ===================================================== SETTINGS -->
+<main id="page-settings" class="page">
+  <div class="pagewrap narrow">
+    <h2>Settings</h2>
+    <form id="settingsForm">
+      <h3>API keys <small class="muted">optional — unlock extra modules</small></h3>
+      <div id="keyFields" class="fields"></div>
+      <h3>Engine</h3>
+      <div class="fields">
+        <label>Max entities per scan<input type="number" name="max_entities"></label>
+        <label>Worker threads<input type="number" name="threads"></label>
+        <label>External tool timeout (s)<input type="number" name="tool_timeout"></label>
+      </div>
+      <button class="primary" type="submit">Save</button>
+      <button class="btn" type="button" id="testNotify">Send test notification</button>
+      <span id="saved" class="muted"></span>
+    </form>
+    <h3>Use responsibly</h3>
+    <p class="muted">Collect only public information, for lawful purposes, and respect platform terms and
+      privacy laws (GDPR etc.). Do not use this to stalk, harass or dox people.</p>
+  </div>
+</main>
+
+<div id="toast" class="toast"></div>
+
+<!-- GUIDE MODAL -->
+<div id="guideModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center;">
+  <div style="background: #151b32; border: 1px solid #333; border-radius: 8px; width: 90%; max-width: 900px; max-height: 85vh; overflow-y: auto; display: flex; flex-direction: column;">
+    <div style="position: sticky; top: 0; background: #0f1624; padding: 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+      <h1 style="margin: 0; font-size: 24px; color: #00d4ff;">Keftemulator User Guide</h1>
+      <button id="guideClose" style="background: #333; border: none; color: #fff; font-size: 24px; cursor: pointer; width: 40px; height: 40px; border-radius: 4px; font-weight: bold;">✕</button>
+    </div>
+    <div id="guideContent" style="padding: 20px; overflow-y: auto; flex: 1; font-family: 'IBM Plex Sans', sans-serif; color: #e0e0e0; font-size: 13px; line-height: 1.6;"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.30.2/cytoscape.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

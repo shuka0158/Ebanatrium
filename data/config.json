@@ -1,0 +1,19 @@
+{
+  "api_keys": {
+    "shodan": "cATVEQluKLyeeg0Z7fwkwUXD8QiSILyg",
+    "hibp": "",
+    "hunter": "e93059a83433e844d5d8ab6aba114ba92d8e921c",
+    "virustotal": "3567a63176df4604cd2dd923d936c08d41ddc9e4c1f3e7e75eebbf1b7408d3e7",
+    "abuseipdb": "5fae3256af32555c21e2e88c441de776f6c9c11304d0f42431a29e94ece5fcee876aafddcf023a6f",
+    "numverify": "989e7f4da32c9d20987fc783abe2aebc",
+    "github_token": "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",
+    "carto": "cb1_51ck_1_e5f087288fa0054bb3e68044",
+    "intelx": "",
+    "urlscan": "",
+    "ntfy_topic": ""
+  },
+  "max_depth": 2,
+  "max_entities": 400,
+  "threads": 8,
+  "tool_timeout": 600
+}
