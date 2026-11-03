@@ -59,20 +59,45 @@ class ContactTreeSearch(Module):
                 filename = row['filename']
                 ftype = row['file_type']
                 filepath = row['file_path']
+                content = row['text_content'] or ""
 
                 if ftype == 'pdf':
-                    # Extract IDs from content
-                    ids = re.findall(r'\d{11}', row['text_content'] or "")
+                    # Extract IDs and info from dossier
+                    ids = re.findall(r'\d{11}', content)
+                    name_match = re.search(r'Name\s+([^\n]+)', content, re.IGNORECASE)
+                    gender_match = re.search(r'Gender\s+([^\n]+)', content, re.IGNORECASE)
+                    dob_match = re.search(r'Date of birth\s+([^\n]+)', content, re.IGNORECASE)
+
                     label = f"📄 {filename}"
                     if ids:
                         label += f" (ID: {ids[0]})"
 
+                    # Emit PDF link
                     ctx.emit("link", label, filepath,
                             {"type": "dossier", "source": "contact_tree",
                              "file_type": "pdf"})
 
+                    # Emit extracted dossier data
+                    if ids:
+                        ctx.emit("info", f"🆔 ID", ids[0],
+                                {"type": "id", "source": "contact_tree_pdf"})
+                    if name_match:
+                        ctx.emit("info", f"👤 Name", name_match.group(1).strip(),
+                                {"type": "name", "source": "contact_tree_pdf"})
+                    if gender_match:
+                        ctx.emit("info", f"⚧ Gender", gender_match.group(1).strip(),
+                                {"type": "gender", "source": "contact_tree_pdf"})
+                    if dob_match:
+                        ctx.emit("info", f"📅 DOB", dob_match.group(1).strip(),
+                                {"type": "date_of_birth", "source": "contact_tree_pdf"})
+
+                    # Emit content preview
+                    preview = content[:300].replace('\n', ' ')
+                    ctx.emit("info", f"📋 Dossier", preview,
+                            {"type": "document", "source": "contact_tree_pdf"})
+
                 elif ftype == 'image':
-                    ctx.emit("link", f"📸 {filename}", filepath,
+                    ctx.emit("image_url", f"📸 {filename}", filepath,
                             {"type": "screenshot", "source": "contact_tree"})
 
             conn.close()
