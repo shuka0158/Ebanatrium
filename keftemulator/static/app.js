@@ -224,7 +224,7 @@ function renderResults() {
     groups[t].map(n => {
       const img = n.data.avatar || n.data.preview;
       return `<div class="item ${S.sel === n.id ? "sel" : ""}" data-id="${n.id}">
-        ${img ? `<img src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ""}
+        ${img ? `<img src="${esc(img)}" alt="" loading="eager" style="max-width: 100%; height: auto; margin-bottom: 8px;">` : ""}
         <span class="v">${esc(n.label || n.value)}</span><span class="s">${esc(summary(n))}</span>
         <span class="m">${esc(n.module)}</span></div>`;
     }).join("") + "</div>").join("") || `<div class="group muted" style="padding:24px">${S.scan.status === "running" ? "Collecting…" : "No results."}</div>`;
