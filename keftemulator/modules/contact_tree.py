@@ -2,6 +2,7 @@
 import sqlite3
 import os
 import re
+from urllib.parse import quote
 from ..core import Module
 
 class ContactTreeSearch(Module):
@@ -98,12 +99,13 @@ class ContactTreeSearch(Module):
                     ctx.emit("company", label, filename, metadata, rel="dossier")
 
                 elif ftype == 'image':
-                    # Emit images with 'preview' property so they render as actual images in sidebar!
-                    image_url = f"/api/contact-tree/image/{filename}"
+                    # Emit images with URL-encoded filename (spaces must be %20)
+                    encoded_filename = quote(filename, safe='')
+                    image_url = f"/api/contact-tree/image/{encoded_filename}"
                     img_data = {
                         "source": "contact_tree",
                         "filename": filename,
-                        "preview": image_url  # KEY: This displays the image in sidebar
+                        "preview": image_url  # This renders the image thumbnail
                     }
                     ctx.emit("image_url", f"📸 {filename}", image_url, img_data)
 
@@ -111,11 +113,12 @@ class ContactTreeSearch(Module):
             if ent.type == "name":
                 for doc in all_docs:
                     if doc['file_type'] == 'image':
-                        image_url = f"/api/contact-tree/image/{doc['filename']}"
+                        encoded_filename = quote(doc['filename'], safe='')
+                        image_url = f"/api/contact-tree/image/{encoded_filename}"
                         img_data = {
                             "source": "contact_tree",
                             "filename": doc['filename'],
-                            "preview": image_url  # KEY: This displays the image in sidebar
+                            "preview": image_url  # This renders the image thumbnail
                         }
                         ctx.emit("image_url", f"📸 {doc['filename']}", image_url, img_data)
 
