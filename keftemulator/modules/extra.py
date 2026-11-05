@@ -841,7 +841,8 @@ class SocialMediaAPI(Module):
                 ]:
                     m = re.search(pattern, r.text, re.I)
                     if m:
-                        data[field] = m.group(2) if ")" in pattern else m.group(1)
+                        # Use group 2 if it exists, otherwise use group 1
+                        data[field] = m.group(2) if len(m.groups()) > 1 else m.group(1)
             
             if data:
                 ctx.update(data)
