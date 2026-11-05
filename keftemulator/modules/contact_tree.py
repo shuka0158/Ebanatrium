@@ -56,47 +56,19 @@ class ContactTreeSearch(Module):
                         ctx.emit("company", f"👤 Individual {q}", q, data)
                         break
             else:
-                # Name search - show ALL
+                # Name search - filter by query text
                 if ent.type == "name":
-                    matched = all_docs
+                    matched = [doc for doc in all_docs if q.lower() in (doc['text_content'] or "").lower()]
 
-            # Emit each dossier as COMPANY node (shows in sidebar with all data)
+            # Emit each matched result (skip PDF dossiers - only show images)
             for doc in matched:
                 filename = doc['filename']
                 ftype = doc['file_type']
                 content = doc['text_content'] or ""
 
+                # Skip PDF dossiers - don't show them in results
                 if ftype == 'pdf':
-                    # Extract all data
-                    ids = re.findall(r'\d{11}', content)
-                    gender_match = re.search(r'Gender\s+([^\n]+)', content, re.IGNORECASE)
-                    dob_match = re.search(r'Date of birth\s+([^\n]+)', content, re.IGNORECASE)
-                    district_match = re.search(r'District:\s*([^\n]+)', content)
-
-                    id_str = ids[0] if ids else "Unknown"
-
-                    # Build rich metadata for sidebar display
-                    metadata = {
-                        "file": doc['file_path'],
-                        "type": "dossier",
-                        "source": "contact_tree",
-                        "id": id_str,
-                    }
-
-                    if gender_match:
-                        metadata["gender"] = gender_match.group(1).strip()
-                    if dob_match:
-                        metadata["dob"] = dob_match.group(1).strip()
-                    if district_match:
-                        metadata["district"] = district_match.group(1).strip()
-
-                    # Full content as preview
-                    preview = content[:300].replace('\n', ' ')
-                    metadata["content"] = preview
-
-                    # Emit as COMPANY (shows nicely in sidebar with all metadata)
-                    label = f"📄 {filename} ({id_str})"
-                    ctx.emit("company", label, filename, metadata, rel="dossier")
+                    continue
 
                 elif ftype == 'image':
                     # Emit images with URL-encoded filename (spaces must be %20)
@@ -109,18 +81,7 @@ class ContactTreeSearch(Module):
                     }
                     ctx.emit("image_url", f"📸 {filename}", image_url, img_data)
 
-            # For name searches: also emit ALL images
-            if ent.type == "name":
-                for doc in all_docs:
-                    if doc['file_type'] == 'image':
-                        encoded_filename = quote(doc['filename'], safe='')
-                        image_url = f"/api/contact-tree/image/{encoded_filename}"
-                        img_data = {
-                            "source": "contact_tree",
-                            "filename": doc['filename'],
-                            "preview": image_url  # This renders the image thumbnail
-                        }
-                        ctx.emit("image_url", f"📸 {doc['filename']}", image_url, img_data)
+            # Only show images that matched the search, don't emit ALL images
 
             conn.close()
 
