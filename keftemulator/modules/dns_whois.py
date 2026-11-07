@@ -34,12 +34,12 @@ class DNSWhoIsLookup(Module):
 
         # MX Records
         try:
-            import dns.resolver if 'dns' in dir() else None
             try:
+                import dns.resolver
                 mx_records = dns.resolver.resolve(domain, 'MX')
                 info["mx_records"] = [str(mx.exchange) for mx in mx_records]
                 ctx.log(f"MX records found: {len(info['mx_records'])}", "info")
-            except:
+            except ImportError:
                 pass
         except:
             pass
