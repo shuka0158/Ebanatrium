@@ -249,13 +249,13 @@ function renderResults() {
 
     el.innerHTML = items.map(n => {
       const img = n.data.avatar || n.data.preview;
-      const label = n.label || n.value || "Unknown";
-      const mod = n.module || "Unknown";
-      return `<div class="item ${S.sel === n.id ? "sel" : ""}" data-id="${n.id}" style="padding: 12px; border: 1px solid #333; border-radius: 4px; margin-bottom: 8px; background: #1a1a1a; cursor: pointer;">
-        ${img ? `<img src="${esc(img)}" alt="" loading="eager" style="max-width: 100%; height: auto; margin-bottom: 8px;">` : ""}
-        <div class="v" style="color: #fff; font-weight: bold;">${esc(label)}</div>
-        <div class="s" style="color: #888; font-size: 12px; margin-top: 4px;">${esc(summary(n))}</div>
-        <div class="m" style="color: #666; font-size: 11px; margin-top: 4px;">📌 ${esc(mod)}</div>
+      return `<div class="item ${S.sel === n.id ? "sel" : ""}" data-id="${n.id}">
+        ${img ? `<img src="${esc(img)}" alt="" loading="eager" style="max-width: 100%; height: auto;">` : ""}
+        <div>
+          <span class="v">${esc(n.label || n.value)}</span><br>
+          <span class="s">${esc(summary(n))}</span><br>
+          <span class="m">📌 ${esc(n.module)}</span>
+        </div>
       </div>`;
     }).join("");
   });
