@@ -20,6 +20,14 @@ small{font-size:12px}
 .brand{font:600 15px var(--mono);letter-spacing:.12em;white-space:nowrap}
 .brand small{color:var(--muted);letter-spacing:0;font-weight:400}
 .logo{color:var(--accent)}
+.na-element{
+  display:inline-block;
+  height:50px;
+  width:auto;
+  margin:0 4px -8px 4px;
+  vertical-align:middle;
+  object-fit:contain;
+}
 .na-icon{
   display:inline-block;
   background:#ffffff;
