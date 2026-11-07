@@ -149,8 +149,16 @@ function openScan(id, caseId) {
                      caseId: caseId || null, src: caseId ? `/api/cases/${caseId}` : `/api/scans/${id}` });
   $("#notes").dataset.sid = "";
   S.geocoded = new Set();
-  $("#log").innerHTML = ""; $("#embeds").innerHTML = ""; $("#empty").classList.add("hidden"); $("#scanView").classList.remove("hidden");
-  $("#detail").classList.add("hidden");
+  const logEl = $("#log");
+  const embedsEl = $("#embeds");
+  const emptyEl = $("#empty");
+  const scanViewEl = $("#scanView");
+  const detailEl = $("#detail");
+  if (logEl) logEl.innerHTML = "";
+  if (embedsEl) embedsEl.innerHTML = "";
+  if (emptyEl) emptyEl.classList.add("hidden");
+  if (scanViewEl) scanViewEl.classList.remove("hidden");
+  if (detailEl) detailEl.classList.add("hidden");
   ["Json","Csv","Html"].forEach(f => $("#ex" + f).href = `/api/scans/${id}/export?fmt=${f.toLowerCase()}`);
   if (caseId) $("#exHtml").href = `/api/cases/${caseId}/export`;
   ["#exJson","#exCsv","#caseBtn","#monBtn"].forEach(sel => $(sel).classList.toggle("hidden", !!caseId));
@@ -198,9 +206,12 @@ function renderHead() {
   $("#stopBtn").classList.toggle("hidden", s.status !== "running" || !!S.caseId);
   const counts = {};
   S.nodes.forEach(n => counts[n.type] = (counts[n.type] || 0) + 1);
-  $("#stats").innerHTML = ORDER.filter(t => counts[t]).concat(Object.keys(counts).filter(t => !ORDER.includes(t)))
-    .map(t => `<span class="stat ${S.filterType === t ? "on" : ""}" data-t="${t}"><span style="color:${col(t)}">●</span> ${t} <b>${counts[t]}</b></span>`).join("");
-  $$("#stats .stat").forEach(el => el.onclick = () => { S.filterType = S.filterType === el.dataset.t ? null : el.dataset.t; renderHead(); renderResults(); });
+  const statsEl = $("#stats");
+  if (statsEl) {
+    statsEl.innerHTML = ORDER.filter(t => counts[t]).concat(Object.keys(counts).filter(t => !ORDER.includes(t)))
+      .map(t => `<span class="stat ${S.filterType === t ? "on" : ""}" data-t="${t}"><span style="color:${col(t)}">●</span> ${t} <b>${counts[t]}</b></span>`).join("");
+    $$("#stats .stat").forEach(el => el.onclick = () => { S.filterType = S.filterType === el.dataset.t ? null : el.dataset.t; renderHead(); renderResults(); });
+  }
 }
 
 function summary(n) {
