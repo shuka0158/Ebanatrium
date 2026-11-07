@@ -16,6 +16,12 @@ Hey guys, I really wanna make this OSINT powerful and max it out, so if anyone h
 - 🕷️ **Web Crawler** - Photon web scraping
 - 🧪 **Periodic Table Branding** - Na (Sodium) element styling
 
+## Screenshots
+
+![Ebanatrium Interface 1](screenshots/screenshot1.png)
+
+![Ebanatrium Interface 2](screenshots/screenshot2.png)
+
 ## Architecture
 
 ```
