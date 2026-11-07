@@ -10,7 +10,7 @@ class DirectClaudeAnalysis(Module):
     description = "Direct analysis from Claude running locally - ZERO costs!"
     accepts = ("company", "domain", "ip_address", "url", "email_address", "phone")
 
-    BRIDGE_URL = "http://localhost:7777/analyze"
+    BRIDGE_URL = "http://localhost:7778/analyze"
 
     def run(self, ent, ctx):
         target = ent.value.strip()

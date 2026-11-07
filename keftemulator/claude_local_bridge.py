@@ -2,6 +2,7 @@
 """
 Direct Claude Bridge - Connects Keftemulator to Claude Code locally
 NO API costs - uses local stdin/stdout to Claude context
+Uses port 7778 (tunnel uses 7777)
 """
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -29,7 +30,6 @@ class DirectClaudeHandler(BaseHTTPRequestHandler):
                 print(f"[BRIDGE] Waiting for Claude to process...\n")
                 
                 # Send request to Claude Code context
-                # Claude will see this in the terminal and can respond
                 request_prompt = f"""
 KEFTEMULATOR ANALYSIS REQUEST:
 Target: {target}
@@ -69,7 +69,7 @@ Include: identification, relationships, risks, findings, vectors, patterns, summ
         """Suppress default logging"""
         pass
 
-def run_bridge(port=7777):
+def run_bridge(port=7778):
     """Start the direct Claude bridge"""
     
     print("\n" + "=" * 60)
@@ -77,7 +77,7 @@ def run_bridge(port=7777):
     print("=" * 60)
     print(f"\n📍 Local connection: http://localhost:{port}")
     print("\n💬 How this works:")
-    print("  1. Keftemulator sends analysis request to localhost:7777")
+    print("  1. Keftemulator sends analysis request to localhost:7778")
     print("  2. Bridge prints request in your terminal")
     print("  3. YOU provide analysis as Claude")
     print("  4. Results sent back to Keftemulator")
