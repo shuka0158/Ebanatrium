@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Direct Claude Bridge - Auto-submits analysis to Keftemulator
-ZERO MANUAL STEPS - 100% AUTOMATIC
+100% AUTOMATIC - NO MANUAL STEPS
 """
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -12,7 +12,7 @@ from datetime import datetime
 ANALYSIS_FILE = "/media/mount/Keftemulator/data/ai_analysis/pending.json"
 
 class DirectClaudeHandler(BaseHTTPRequestHandler):
-    """Direct bridge to Claude - auto-submit to Keftemulator"""
+    """Direct bridge - auto-submit to Keftemulator"""
     
     def do_OPTIONS(self):
         """Handle CORS preflight"""
@@ -23,30 +23,35 @@ class DirectClaudeHandler(BaseHTTPRequestHandler):
         self.end_headers()
     
     def do_GET(self):
-        """Check for pending analysis"""
+        """Return pending analysis"""
         if self.path == "/check":
             try:
                 if os.path.exists(ANALYSIS_FILE):
                     with open(ANALYSIS_FILE, 'r') as f:
-                        data = json.load(f)
-                        self.send_response(200)
-                        self.send_header('Content-Type', 'application/json')
-                        self.send_header('Access-Control-Allow-Origin', '*')
-                        self.end_headers()
-                        self.wfile.write(json.dumps(data).encode())
-                        # Clear after reading
-                        open(ANALYSIS_FILE, 'w').write('{}')
-                        return
+                        content = f.read()
+                        data = json.loads(content) if content and content != '{}' else {}
+                        
+                        if data and data.get('analysis'):
+                            # Found analysis - return it
+                            self.send_response(200)
+                            self.send_header('Content-Type', 'application/json')
+                            self.send_header('Access-Control-Allow-Origin', '*')
+                            self.end_headers()
+                            self.wfile.write(json.dumps(data).encode())
+                            # KEEP the file so multiple reads work
+                            return
             except:
                 pass
             
+            # No analysis or error
             self.send_response(204)
+            self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
         else:
             self.send_error(404)
     
     def do_POST(self):
-        """Handle analysis requests"""
+        """Handle analysis requests and submissions"""
         
         if self.path == "/analyze":
             content_length = int(self.headers.get('Content-Length', 0))
@@ -55,15 +60,17 @@ class DirectClaudeHandler(BaseHTTPRequestHandler):
             try:
                 data = json.loads(body)
                 target = data.get('target', 'unknown')
+                analysis = data.get('analysis')
                 analysis_type = data.get('type', 'general')
                 
-                # Check if this is analysis submission (from Claude)
-                if data.get('analysis'):
-                    # AUTO-SAVE to file for Keftemulator to pick up
+                # Check if this is analysis submission
+                if analysis:
+                    # SAVE to file for Keftemulator to pick up
+                    os.makedirs(os.path.dirname(ANALYSIS_FILE), exist_ok=True)
                     with open(ANALYSIS_FILE, 'w') as f:
                         json.dump({
                             'target': target,
-                            'analysis': data.get('analysis'),
+                            'analysis': analysis,
                             'timestamp': datetime.now().isoformat()
                         }, f)
                     
@@ -75,30 +82,16 @@ class DirectClaudeHandler(BaseHTTPRequestHandler):
                         "success": True,
                         "status": "analysis_saved"
                     }).encode())
-                    print(f"✅ ANALYSIS AUTO-SAVED FOR: {target}")
+                    print(f"\n✅ ANALYSIS AUTO-SAVED FOR: {target}\n")
                     return
                 
                 # Normal analysis request
-                print(f"\n[BRIDGE] Keftemulator requesting analysis: {target}")
-                print(f"[BRIDGE] Type: {analysis_type}\n")
-                
+                print(f"\n[BRIDGE] Analyzing: {target}")
                 print("=" * 60)
-                print("OSINT ANALYSIS NEEDED:")
+                print("RESPOND WITH ANALYSIS!")
                 print("=" * 60)
-                print(f"""
-RESPOND HERE WITH ANALYSIS FOR: {target}
-
-Format: Send your analysis as JSON like this:
-
-{{
-  "target": "{target}",
-  "analysis": "YOUR ANALYSIS TEXT HERE..."
-}}
-
-Or just paste in chat and I'll auto-submit!
-""")
-                print("=" * 60)
-                print("\n(Analysis will auto-appear in Keftemulator - NO MANUAL STEPS!)\n")
+                print(f"\nTarget: {target}")
+                print(f"Type: {analysis_type}\n")
                 
                 result = {
                     "success": True,
@@ -120,29 +113,25 @@ Or just paste in chat and I'll auto-submit!
             self.send_error(404)
     
     def log_message(self, format, *args):
-        """Suppress default logging"""
+        """Suppress logging"""
         pass
 
 def run_bridge(port=7778):
-    """Start the direct Claude bridge"""
+    """Start bridge"""
     
     print("\n" + "=" * 60)
-    print("🔗 CLAUDE BRIDGE - 100% AUTOMATIC MODE")
+    print("🔗 CLAUDE BRIDGE - AUTO-SUBMIT ACTIVE")
     print("=" * 60)
-    print(f"\n📍 Listening on: http://0.0.0.0:{port}")
-    print("\n🤖 AUTO-SUBMIT ENABLED:")
-    print("  • Analysis auto-saves to Keftemulator")
-    print("  • Keftemulator auto-displays it")
-    print("  • ZERO manual steps!")
-    print("\n" + "=" * 60 + "\n")
+    print(f"\n✅ Listening on: http://0.0.0.0:{port}")
+    print("✅ Auto-polling: http://localhost:7778/check")
+    print("✅ Analysis auto-displays in Keftemulator\n")
     
     server = HTTPServer(("0.0.0.0", port), DirectClaudeHandler)
-    print("✅ Bridge ready! Auto-submit enabled!\n")
     
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print("\n⏹️ Bridge stopped")
+        print("\n⏹️ Stopped")
         server.server_close()
 
 if __name__ == "__main__":
