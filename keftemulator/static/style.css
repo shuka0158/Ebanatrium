@@ -20,6 +20,18 @@ small{font-size:12px}
 .brand{font:600 15px var(--mono);letter-spacing:.12em;white-space:nowrap}
 .brand small{color:var(--muted);letter-spacing:0;font-weight:400}
 .logo{color:var(--accent)}
+.na-icon{
+  display:inline-block;
+  background:linear-gradient(135deg, #00ff88 0%, #00dd77 100%);
+  color:#000000;
+  font-weight:700;
+  padding:2px 6px;
+  border-radius:3px;
+  font-size:12px;
+  margin:0 2px;
+  border:1px solid #00ff88;
+  box-shadow:0 0 8px rgba(0,255,136,0.4);
+}
 nav{display:flex;gap:2px;overflow-x:auto}
 .nav{background:none;border:0;text-decoration:none;padding:8px 14px;border-radius:6px;color:var(--muted)}
 .nav:hover{color:var(--text);background:var(--panel2)}
