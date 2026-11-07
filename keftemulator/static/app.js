@@ -260,6 +260,41 @@ function renderResults() {
   // Add click handlers
   $$(".category .item, #resultList .item").forEach(el => el.onclick = () => showDetail(+el.dataset.id));
   renderEmbeds();
+
+  // Auto-trigger AI analysis if results exist
+  if (S.nodes.size > 0) triggerAIAnalysis();
+}
+
+async function triggerAIAnalysis() {
+  if (!S.scan || S.scan.status === "running") return;
+  if (S._aiTriggered) return;
+  S._aiTriggered = true;
+
+  const target = S.scan.target;
+  const analysisEl = $("#ai-analysis-results");
+  if (!analysisEl) return;
+
+  try {
+    analysisEl.innerHTML = '<div style="padding:20px; text-align:center; color:#999;">🧠 Claude analyzing findings...</div>';
+
+    const resp = await fetch(`http://${window.location.hostname}:7778/analyze`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({target, type: "deep_analysis"}),
+      timeout: 120000
+    });
+
+    if (!resp.ok) throw new Error("Bridge error");
+    const data = await resp.json();
+
+    if (data.success && data.analysis) {
+      analysisEl.innerHTML = `<div class="analysis-results">${esc(data.analysis)}</div>`;
+    } else if (data.status === "analysis_requested") {
+      analysisEl.innerHTML = '<div style="padding:20px; color:#999;">⏳ Waiting for Claude analysis from terminal...</div>';
+    }
+  } catch (err) {
+    analysisEl.innerHTML = `<div style="padding:20px; color:#ff6b6b;">⚠️ Analysis unavailable - bridge may not be running</div>`;
+  }
 }
 $("#filter").oninput = renderResults;
 
