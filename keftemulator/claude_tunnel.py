@@ -124,7 +124,7 @@ def run_tunnel(port=7777):
     print("\nEndpoint: http://localhost:{port}/analyze")
     print("\n" + "=" * 50 + "\n")
     
-    server = HTTPServer(("localhost", port), ClaudeTunnelHandler)
+    server = HTTPServer(("0.0.0.0", port), ClaudeTunnelHandler)
     print("✅ Ready! Listening for requests...\n")
     
     try:

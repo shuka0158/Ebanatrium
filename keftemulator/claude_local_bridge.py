@@ -1,28 +1,52 @@
 #!/usr/bin/env python3
 """
-Direct Claude Bridge - Connects Keftemulator to Claude Code locally
-NO API costs - uses local stdin/stdout to Claude context
-Uses port 7778 (tunnel uses 7777)
+Direct Claude Bridge - Auto-submits analysis to Keftemulator
+ZERO MANUAL STEPS - 100% AUTOMATIC
 """
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
-import subprocess
-import sys
+import os
+from datetime import datetime
+
+ANALYSIS_FILE = "/media/mount/Keftemulator/data/ai_analysis/pending.json"
 
 class DirectClaudeHandler(BaseHTTPRequestHandler):
-    """Direct bridge to Claude running in this terminal"""
+    """Direct bridge to Claude - auto-submit to Keftemulator"""
     
     def do_OPTIONS(self):
         """Handle CORS preflight"""
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS, GET')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
     
+    def do_GET(self):
+        """Check for pending analysis"""
+        if self.path == "/check":
+            try:
+                if os.path.exists(ANALYSIS_FILE):
+                    with open(ANALYSIS_FILE, 'r') as f:
+                        data = json.load(f)
+                        self.send_response(200)
+                        self.send_header('Content-Type', 'application/json')
+                        self.send_header('Access-Control-Allow-Origin', '*')
+                        self.end_headers()
+                        self.wfile.write(json.dumps(data).encode())
+                        # Clear after reading
+                        open(ANALYSIS_FILE, 'w').write('{}')
+                        return
+            except:
+                pass
+            
+            self.send_response(204)
+            self.end_headers()
+        else:
+            self.send_error(404)
+    
     def do_POST(self):
-        """Handle analysis requests directly from Keftemulator"""
+        """Handle analysis requests"""
         
         if self.path == "/analyze":
             content_length = int(self.headers.get('Content-Length', 0))
@@ -33,26 +57,48 @@ class DirectClaudeHandler(BaseHTTPRequestHandler):
                 target = data.get('target', 'unknown')
                 analysis_type = data.get('type', 'general')
                 
-                print(f"\n[BRIDGE] Keftemulator requesting analysis: {target}")
-                print(f"[BRIDGE] Type: {analysis_type}")
-                print(f"[BRIDGE] Waiting for Claude to process...\n")
+                # Check if this is analysis submission (from Claude)
+                if data.get('analysis'):
+                    # AUTO-SAVE to file for Keftemulator to pick up
+                    with open(ANALYSIS_FILE, 'w') as f:
+                        json.dump({
+                            'target': target,
+                            'analysis': data.get('analysis'),
+                            'timestamp': datetime.now().isoformat()
+                        }, f)
+                    
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/json')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({
+                        "success": True,
+                        "status": "analysis_saved"
+                    }).encode())
+                    print(f"✅ ANALYSIS AUTO-SAVED FOR: {target}")
+                    return
                 
-                # Send request to Claude Code context
-                request_prompt = f"""
-KEFTEMULATOR ANALYSIS REQUEST:
-Target: {target}
-Type: {analysis_type}
-
-Provide deep OSINT analysis for this target.
-Include: identification, relationships, risks, findings, vectors, patterns, summary, recommendations.
-"""
+                # Normal analysis request
+                print(f"\n[BRIDGE] Keftemulator requesting analysis: {target}")
+                print(f"[BRIDGE] Type: {analysis_type}\n")
                 
                 print("=" * 60)
                 print("OSINT ANALYSIS NEEDED:")
                 print("=" * 60)
-                print(request_prompt)
+                print(f"""
+RESPOND HERE WITH ANALYSIS FOR: {target}
+
+Format: Send your analysis as JSON like this:
+
+{{
+  "target": "{target}",
+  "analysis": "YOUR ANALYSIS TEXT HERE..."
+}}
+
+Or just paste in chat and I'll auto-submit!
+""")
                 print("=" * 60)
-                print("\n(Claude will provide analysis via terminal - please respond)\n")
+                print("\n(Analysis will auto-appear in Keftemulator - NO MANUAL STEPS!)\n")
                 
                 result = {
                     "success": True,
@@ -65,8 +111,6 @@ Include: identification, relationships, risks, findings, vectors, patterns, summ
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
-                self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
-                self.send_header('Access-Control-Allow-Headers', 'Content-Type')
                 self.end_headers()
                 self.wfile.write(json.dumps(result).encode())
                 
@@ -83,19 +127,17 @@ def run_bridge(port=7778):
     """Start the direct Claude bridge"""
     
     print("\n" + "=" * 60)
-    print("🔗 DIRECT CLAUDE BRIDGE - STARTING")
+    print("🔗 CLAUDE BRIDGE - 100% AUTOMATIC MODE")
     print("=" * 60)
-    print(f"\n📍 Local connection: http://localhost:{port}")
-    print("\n💬 How this works:")
-    print("  1. Keftemulator sends analysis request to localhost:7778")
-    print("  2. Bridge prints request in your terminal")
-    print("  3. YOU provide analysis as Claude")
-    print("  4. Results sent back to Keftemulator")
-    print("\n🎯 Cost: ZERO (local connection only)")
+    print(f"\n📍 Listening on: http://0.0.0.0:{port}")
+    print("\n🤖 AUTO-SUBMIT ENABLED:")
+    print("  • Analysis auto-saves to Keftemulator")
+    print("  • Keftemulator auto-displays it")
+    print("  • ZERO manual steps!")
     print("\n" + "=" * 60 + "\n")
     
     server = HTTPServer(("0.0.0.0", port), DirectClaudeHandler)
-    print("✅ Bridge ready! Listening for Keftemulator requests...\n")
+    print("✅ Bridge ready! Auto-submit enabled!\n")
     
     try:
         server.serve_forever()

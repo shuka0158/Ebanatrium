@@ -695,3 +695,28 @@ document.addEventListener("keydown", (e) => {
 });
 
 initForm().then(() => { refreshCaseLists(); loadMonitors(); const pg = location.hash.match(/page=(\w+)/); if (pg) showPage(pg[1]); const cs = location.hash.match(/case=(\d+)/); if (cs) openCase(+cs[1]); const m = location.hash.match(/scan=(\d+)/); if (m) { openScan(+m[1]); const v = location.hash.match(/view=(\w+)/); if (v) setTimeout(() => switchView(v[1]), 1500); } });
+
+// Auto-poll bridge for analysis updates
+setInterval(async function checkForAnalysis() {
+  try {
+    const resp = await fetch(`http://${window.location.hostname}:7778/check`);
+    if (resp.status === 200) {
+      const data = await resp.json();
+      if (data.analysis) {
+        const el = $("#ai-analysis-results");
+        if (el) {
+          el.innerHTML = `<div class="analysis-results" style="white-space: pre-wrap; word-break: break-word;">${esc(data.analysis)}</div>`;
+          console.log("✅ Analysis auto-loaded!");
+          // Auto-switch to AI Analysis tab
+          $$(".tab").forEach(t => t.classList.remove("active"));
+          $$(".tab[data-view='ai-analysis']")[0].classList.add("active");
+          $$(".view").forEach(v => v.classList.add("hidden"));
+          $("#view-ai-analysis").classList.remove("hidden");
+        }
+      }
+    }
+  } catch (e) {
+    // Bridge not responding - normal
+  }
+}, 2000); // Check every 2 seconds
+
