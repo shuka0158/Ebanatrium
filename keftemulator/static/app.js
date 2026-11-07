@@ -277,23 +277,31 @@ async function triggerAIAnalysis() {
   try {
     analysisEl.innerHTML = '<div style="padding:20px; text-align:center; color:#999;">🧠 Claude analyzing findings...</div>';
 
-    const resp = await fetch(`http://${window.location.hostname}:7778/analyze`, {
+    const bridgeUrl = `http://${window.location.hostname}:7778/analyze`;
+    const ctrl = new AbortController();
+    const timeoutId = setTimeout(() => ctrl.abort(), 120000);
+
+    const resp = await fetch(bridgeUrl, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({target, type: "deep_analysis"}),
-      timeout: 120000
+      signal: ctrl.signal
     });
 
-    if (!resp.ok) throw new Error("Bridge error");
+    clearTimeout(timeoutId);
+
+    if (!resp.ok) throw new Error("Bridge error: " + resp.status);
     const data = await resp.json();
 
     if (data.success && data.analysis) {
       analysisEl.innerHTML = `<div class="analysis-results">${esc(data.analysis)}</div>`;
     } else if (data.status === "analysis_requested") {
-      analysisEl.innerHTML = '<div style="padding:20px; color:#999;">⏳ Waiting for Claude analysis from terminal...</div>';
+      analysisEl.innerHTML = '<div style="padding:20px; color:#999;">⏳ Waiting for Claude analysis from terminal...<br/><small>Bridge is waiting for your response here in the chat.</small></div>';
+    } else {
+      analysisEl.innerHTML = '<div style="padding:20px; color:#999;">⏳ Bridge connecting...</div>';
     }
   } catch (err) {
-    analysisEl.innerHTML = `<div style="padding:20px; color:#ff6b6b;">⚠️ Analysis unavailable - bridge may not be running</div>`;
+    analysisEl.innerHTML = `<div style="padding:20px; color:#ff6b6b;">⚠️ Bridge error: ${err.message}</div>`;
   }
 }
 $("#filter").oninput = renderResults;
