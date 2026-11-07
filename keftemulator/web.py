@@ -466,7 +466,7 @@ def api_install(name):
 def main():
     import argparse
     ap = argparse.ArgumentParser(description="Keftemulator OSINT")
-    ap.add_argument("--host", default="127.0.0.1")
+    ap.add_argument("--host", default="0.0.0.0")
     ap.add_argument("--port", type=int, default=5050)
     a = ap.parse_args()
     print(f"\n  Keftemulator v{__version__}  →  http://{a.host}:{a.port}\n  data: {DATA}\n", flush=True)
@@ -474,8 +474,8 @@ def main():
         print("  WARNING: no password set — run `keft password`\n", flush=True)
     service.start_scheduler()
     from waitress import serve
-    serve(app, host=a.host, port=a.port, threads=16, trusted_proxy="127.0.0.1",
-          trusted_proxy_headers={"x-forwarded-proto"}, clear_untrusted_proxy_headers=False)
+    serve(app, host=a.host, port=a.port, threads=16, trusted_proxy="*",
+          trusted_proxy_headers={"x-forwarded-proto", "x-forwarded-for"}, clear_untrusted_proxy_headers=False)
 
 
 if __name__ == "__main__":
