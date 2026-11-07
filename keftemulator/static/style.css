@@ -1,5 +1,5 @@
 :root{
-  --bg:#0d0d0d; --panel:#1a1a1a; --panel2:#252525; --line:#333333; --text:#e0e0e0; --muted:#888888;
+  --bg:#000000; --panel:#0a0a0a; --panel2:#1a1a1a; --line:#2a2a2a; --text:#f0f0f0; --muted:#909090;
   --accent:#ffffff; --accent2:#f0f0f0; --warn:#ff9500; --err:#ff4444; --link:#ffffff;
   --mono:"IBM Plex Mono",ui-monospace,monospace; --sans:"IBM Plex Sans",system-ui,sans-serif;
   --r:8px;
@@ -9,7 +9,7 @@
 }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
-body{background:linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);color:var(--text);font:14px/1.45 var(--sans);display:flex;flex-direction:column;overflow:hidden;background-attachment:fixed}
+body{background:#000000;color:var(--text);font:14px/1.45 var(--sans);display:flex;flex-direction:column;overflow:hidden}
 a{color:var(--link)}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
