@@ -304,6 +304,25 @@ async function triggerAIAnalysis() {
     analysisEl.innerHTML = `<div style="padding:20px; color:#ff6b6b;">⚠️ Bridge error: ${err.message}</div>`;
   }
 }
+
+// Submit analysis from textarea
+function submitAnalysis() {
+  const input = $("#ai-analysis-input");
+  const analysis = input.value.trim();
+
+  if (!analysis) {
+    alert("Paste analysis first");
+    return;
+  }
+
+  const resultsDiv = $("#ai-analysis-results");
+  resultsDiv.innerHTML = `<div class="analysis-results" style="white-space: pre-wrap; word-break: break-word;">${esc(analysis)}</div>`;
+
+  // Clear input
+  input.value = "";
+  alert("✅ Analysis submitted and displayed!");
+}
+
 $("#filter").oninput = renderResults;
 
 /* live third-party search pages, loaded in the viewer's own browser */
