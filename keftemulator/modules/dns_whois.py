@@ -23,22 +23,43 @@ class DNSWhoIsLookup(Module):
             "source": "dns_whois"
         }
 
-        # DNS A Record
+        # DNS A Record - ACTUAL DATA
         try:
             ip = socket.gethostbyname(domain)
             info["ip_address"] = ip
-            ctx.log(f"IP: {ip}", "info")
-            ctx.emit("ip_address", ip, parent=ent.id, rel="resolves_to")
+            info["record_type"] = "A"
+
+            # Get IP geolocation with actual data
+            try:
+                import urllib.request, json
+                response = urllib.request.urlopen(f"http://ip-api.com/json/{ip}?fields=country,city,org,isp", timeout=5)
+                geo_data = json.loads(response.read())
+                info["ip_country"] = geo_data.get("country", "Unknown")
+                info["ip_city"] = geo_data.get("city", "Unknown")
+                info["ip_org"] = geo_data.get("org", "Unknown")
+                info["ip_isp"] = geo_data.get("isp", "Unknown")
+
+                ctx.log(f"IP: {ip} | Location: {geo_data.get('city')}, {geo_data.get('country')} | ISP: {geo_data.get('isp')}", "info")
+                label = f"A Record: {ip} ({geo_data.get('country')})"
+            except:
+                ctx.log(f"IP: {ip}", "info")
+                label = f"A Record: {ip}"
+
+            ctx.emit("ip_address", label, parent=ent.id, rel="resolves_to")
         except:
             ctx.log("DNS A record not found", "warn")
 
-        # MX Records
+        # MX Records - ACTUAL EMAIL SERVERS
         try:
             try:
                 import dns.resolver
                 mx_records = dns.resolver.resolve(domain, 'MX')
                 info["mx_records"] = [str(mx.exchange) for mx in mx_records]
-                ctx.log(f"MX records found: {len(info['mx_records'])}", "info")
+
+                if info["mx_records"]:
+                    mx_list = ", ".join(info["mx_records"][:3])  # Show first 3
+                    ctx.log(f"MX Records: {mx_list}", "info")
+                    ctx.emit("company", f"📧 Mail Servers", domain, {"mx_servers": info["mx_records"]}, rel="mail_servers")
             except ImportError:
                 pass
         except:

@@ -88,10 +88,13 @@ class EmailFinder(Module):
         }
 
         if emails_found:
-            for email in list(emails_found)[:5]:  # Emit first 5
+            email_list = list(emails_found)[:10]
+            for email in email_list:  # Emit first 10
                 ctx.emit("email_address", email, parent=ent.id, rel="associated_email")
 
-            ctx.log(f"Found {len(emails_found)} emails", "info")
-            ctx.emit("company", f"📧 Emails Found", query, result, rel="email_results")
+            # SHOW ACTUAL EMAIL ADDRESSES, NOT JUST "FOUND"
+            emails_display = ", ".join(email_list)
+            ctx.log(f"Emails: {emails_display}", "info")
+            ctx.emit("company", f"📧 FOUND {len(emails_found)} EMAIL(S): {emails_display}", query, result, rel="email_results")
         else:
             ctx.log("No emails found", "warn")

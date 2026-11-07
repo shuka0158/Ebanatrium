@@ -24,7 +24,7 @@ class PhoneIdentifier(Module):
             "source": "phone_identifier"
         }
 
-        # Try libphonenumber via API
+        # Get ACTUAL phone data - carrier, location, type
         try:
             resp = requests.get(
                 f"https://neutrinoapi.com/phone-validate?number={phone_clean}",
@@ -41,7 +41,16 @@ class PhoneIdentifier(Module):
                     info["carrier"] = data.get('carrier', 'Unknown')
                     info["location"] = data.get('location', 'Unknown')
 
-                    ctx.log(f"Type: {info['type']}, Carrier: {info['carrier']}, Location: {info['location']}", "info")
+                    # EMIT ACTUAL DATA with all details
+                    phone_type = info.get('type', 'Unknown')
+                    carrier = info.get('carrier', 'Unknown')
+                    location = info.get('location', 'Unknown')
+                    country = info.get('country', 'Unknown')
+
+                    details = f"{phone_type.upper()} | Carrier: {carrier} | Location: {location}, {country}"
+                    ctx.log(f"Phone: {details}", "info")
+                    ctx.emit("company", f"📱 {phone_clean}: {details}", phone, info, rel="phone_info")
+                    return
         except:
             pass
 

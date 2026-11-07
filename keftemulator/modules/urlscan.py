@@ -91,16 +91,30 @@ class URLscanIntegration(Module):
                     if "lists" in results and "urls" in results["lists"]:
                         result_data["linked_urls_count"] = len(results["lists"]["urls"])
 
-                    # Check threat indicators
+                    # Format threat summary with ACTUAL DATA
+                    malicious_count = result_data.get("malicious", 0)
+                    suspicious_count = result_data.get("suspicious", 0)
+                    total = result_data.get("total", 0)
+                    ip = result_data.get("page_ip", "Unknown")
+                    domain = result_data.get("page_domain", "Unknown")
+
+                    # Create detailed summary
+                    summary = f"Threats: {malicious_count} malicious, {suspicious_count} suspicious ({total} total)"
+                    if ip != "Unknown":
+                        summary += f" | IP: {ip}"
+                    if domain != "Unknown":
+                        summary += f" | Domain: {domain}"
+
+                    # Emit with actual data
                     if result_data.get("overall_verdict"):
                         ctx.log("⚠️ MALICIOUS URL DETECTED!", "warn")
-                        ctx.emit("company", f"🚨 URLscan Alert - MALICIOUS", url, result_data, rel="threat")
-                    elif result_data.get("malicious", 0) > 0:
-                        ctx.log(f"⚠️ Detected {result_data['malicious']} malicious indicators", "warn")
-                        ctx.emit("company", f"⚠️ URLscan - Threats Detected", url, result_data, rel="threat")
+                        ctx.emit("company", f"🚨 MALICIOUS: {summary}", url, result_data, rel="threat")
+                    elif malicious_count > 0:
+                        ctx.log(f"⚠️ Detected {malicious_count} malicious indicators", "warn")
+                        ctx.emit("company", f"⚠️ THREATS FOUND: {summary}", url, result_data, rel="threat")
                     else:
                         ctx.log("✅ URL appears clean", "info")
-                        ctx.emit("company", f"✅ URLscan - Clean", url, result_data, rel="scan")
+                        ctx.emit("company", f"✅ CLEAN: {summary}", url, result_data, rel="scan")
 
                 elif result_resp.status_code == 404:
                     ctx.log("Scan still processing, check back later", "info")

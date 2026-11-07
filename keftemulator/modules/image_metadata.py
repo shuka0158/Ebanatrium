@@ -68,7 +68,20 @@ class ImageMetadataExtractor(Module):
                 # File size
                 metadata["file_size"] = len(resp.content)
 
-                ctx.emit("company", f"📸 Image Metadata", url, metadata, rel="metadata")
+                # EMIT ACTUAL METADATA - show the valuable data extracted
+                details = f"{img.width}x{img.height} {metadata.get('format', 'Unknown').upper()}"
+
+                if 'camera_make' in metadata:
+                    details += f" | {metadata['camera_make']}"
+                    if 'camera_model' in metadata:
+                        details += f" {metadata['camera_model']}"
+                if 'datetime' in metadata:
+                    details += f" | {metadata['datetime']}"
+                if 'gps' in metadata:
+                    details += f" | GPS: YES"
+
+                ctx.log(f"Image Data: {details}", "info")
+                ctx.emit("company", f"📸 IMAGE: {details}", url, metadata, rel="metadata")
 
             except ImportError:
                 ctx.log("PIL not available - basic metadata only", "warn")
