@@ -489,3 +489,11 @@ input[type=range]{padding:0;accent-color:var(--accent);height:38px;border:0;back
   font-size: 11px;
 }
 
+
+.na-element{
+  display:inline-block;
+  height:36px;
+  width:36px;
+  margin:0 2px;
+  vertical-align:middle;
+}

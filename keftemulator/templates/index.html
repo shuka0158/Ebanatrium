@@ -12,12 +12,7 @@
 </head>
 <body data-carto="{{ carto_key }}">
 <header class="top">
-  <div class="brand"><span class="logo">◉</span> EBA<span class="na-icon" title="Sodium - Atomic Number 11 - Atomic Mass 22.99">
-    <div class="na-atomic">11</div>
-    <div class="na-symbol">Na</div>
-    <div class="na-name">Sodium</div>
-    <div class="na-mass">22.99</div>
-  </span>TRIUM <small>v{{ version }}</small></div>
+  <div class="brand"><span class="logo">◉</span> EBA<img src="/static/periodic-na.svg" alt="Na" class="na-element" title="Sodium (Na) - Atomic Number 11 - Atomic Mass 22.99">TRIUM <small>v{{ version }}</small></div>
   <nav>
     <button class="nav active" data-page="investigate">Investigate</button>
     <button class="nav" data-page="scans">Scans</button>
@@ -74,7 +69,7 @@
   <section class="work">
     <div id="empty" class="empty">
       <h2>Start with one identifier.</h2>
-      <p>Keftemulator fans it out across native modules and the tools you have installed
+      <p>Eba[Na]trium fans it out across native modules and the tools you have installed
         (Sherlock, Maigret, holehe, theHarvester, PhoneInfoga, ExifTool, SpiderFoot, Recon-ng),
         then pivots on every new email, username, domain, IP, phone and name it finds.</p>
       <div class="examples">
@@ -185,7 +180,7 @@
   <div class="pagewrap">
     <div class="pagehead"><h2>Cases</h2><button class="primary" id="newCaseBtn">New case</button></div>
     <p class="muted">A case merges every scan about one subject into a single graph, map and report.
-      Pick the case in the sidebar before running a scan, or use “Add to case” on an existing scan.</p>
+      Pick the case in the sidebar before running a scan, or use "Add to case" on an existing scan.</p>
     <table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Scans</th><th>Created</th><th></th></tr></thead>
       <tbody id="caseRows"></tbody></table>
   </div>
@@ -247,7 +242,7 @@
 <div id="guideModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center;">
   <div style="background: #151b32; border: 1px solid #333; border-radius: 8px; width: 90%; max-width: 900px; max-height: 85vh; overflow-y: auto; display: flex; flex-direction: column;">
     <div style="position: sticky; top: 0; background: #0f1624; padding: 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
-      <h1 style="margin: 0; font-size: 24px; color: #00d4ff;">Keftemulator User Guide</h1>
+      <h1 style="margin: 0; font-size: 24px; color: #00d4ff;">Eba[Na]trium User Guide</h1>
       <button id="guideClose" style="background: #333; border: none; color: #fff; font-size: 24px; cursor: pointer; width: 40px; height: 40px; border-radius: 4px; font-weight: bold;">✕</button>
     </div>
     <div id="guideContent" style="padding: 20px; overflow-y: auto; flex: 1; font-family: 'IBM Plex Sans', sans-serif; color: #e0e0e0; font-size: 13px; line-height: 1.6;"></div>
