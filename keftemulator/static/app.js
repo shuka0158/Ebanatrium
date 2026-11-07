@@ -236,39 +236,20 @@ function renderResults() {
     else categorized.other.push(n);
   }));
 
-  Object.entries(categorized).forEach(([cat, items]) => {
-    const el = $$(`.category[data-category="${cat}"] .items`)[0];
-    if (!el) return;
+  // Categories disabled - using plain text results instead
 
-    if (!items.length) {
-      const catEl = document.querySelector(`[data-category="${cat}"]`);
-      if (catEl) catEl.classList.add("empty");
-      el.innerHTML = "";
-      return;
-    }
+  // Plain text results output
+  const plainTextResults = types.map(t => {
+    const typeHeader = `${t}`;
+    const typeResults = groups[t].map(n => {
+      const label = esc(n.label || n.value);
+      const module = esc(n.module);
+      return `${label}\n${module}`;
+    }).join("\n\n");
+    return typeHeader + "\n" + typeResults;
+  }).join("\n\n");
 
-    el.innerHTML = items.map(n => {
-      const img = n.data.avatar || n.data.preview;
-      return `<div class="item ${S.sel === n.id ? "sel" : ""}" data-id="${n.id}">
-        ${img ? `<img src="${esc(img)}" alt="" loading="eager" style="max-width: 100%; height: auto;">` : ""}
-        <div>
-          <span class="v">${esc(n.label || n.value)}</span><br>
-          <span class="s">${esc(summary(n))}</span><br>
-          <span class="m">📌 ${esc(n.module)}</span>
-        </div>
-      </div>`;
-    }).join("");
-  });
-
-  // Keep old resultList for compatibility
-  $("#resultList").innerHTML = types.map(t => `<div class="group"><h4><span class="dot" style="background:${col(t)}"></span>${t} · ${groups[t].length}</h4>` +
-    groups[t].map(n => {
-      const img = n.data.avatar || n.data.preview;
-      return `<div class="item ${S.sel === n.id ? "sel" : ""}" data-id="${n.id}">
-        ${img ? `<img src="${esc(img)}" alt="" loading="eager" style="max-width: 100%; height: auto; margin-bottom: 8px;">` : ""}
-        <span class="v">${esc(n.label || n.value)}</span><span class="s">${esc(summary(n))}</span>
-        <span class="m">${esc(n.module)}</span></div>`;
-    }).join("") + "</div>").join("") || `<div class="group muted" style="padding:24px">${S.scan.status === "running" ? "Collecting…" : "No results."}</div>`;
+  $("#resultList").textContent = plainTextResults || (S.scan.status === "running" ? "Collecting…" : "No results.");
 
   // Add click handlers
   $$(".category .item, #resultList .item").forEach(el => el.onclick = () => showDetail(+el.dataset.id));
