@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="/static/style.css">
+<script defer src="/static/image-proxy-ui.js"></script>
 </head>
 <body data-carto="{{ carto_key }}">
 <header class="top">
@@ -99,6 +100,7 @@
       <div id="stats" class="stats"></div>
       <div class="tabs">
         <button class="tab active" data-view="results">Results</button>
+        <button class="tab" data-view="timeline">Timeline</button>
         <button class="tab" data-view="graph">Graph</button>
         <button class="tab" data-view="map">Map</button>
         <button class="tab" data-view="log">Log</button>
@@ -106,7 +108,28 @@
         <input id="filter" placeholder="Filter results…">
       </div>
       <div class="views">
-        <div id="view-results" class="view active"><div id="embeds"></div><div id="resultList"></div></div>
+        <div id="view-results" class="view active">
+          <div id="embeds"></div>
+          <div class="results-categories">
+            <div class="category" data-category="images"><h3>📸 Image Analysis</h3><div class="items"></div></div>
+            <div class="category" data-category="domain"><h3>🌐 Domain Intelligence</h3><div class="items"></div></div>
+            <div class="category" data-category="threat"><h3>🔐 Threat Detection</h3><div class="items"></div></div>
+            <div class="category" data-category="people"><h3>📱 People Search</h3><div class="items"></div></div>
+            <div class="category" data-category="media"><h3>📄 Media Analysis</h3><div class="items"></div></div>
+            <div class="category" data-category="relationships"><h3>🔗 Relationships</h3><div class="items"></div></div>
+            <div class="category" data-category="intelligence"><h3>🔬 Intelligence</h3><div class="items"></div></div>
+            <div class="category" data-category="other"><h3>📋 Other</h3><div id="resultList"></div></div>
+          </div>
+        </div>
+        <div id="view-timeline" class="view">
+          <div id="timeline" class="timeline-container"></div>
+          <div class="timeline-legend">
+            <span class="legend-item"><span class="dot" style="background:#00ff88"></span>Domain Events</span>
+            <span class="legend-item"><span class="dot" style="background:#00ccff"></span>Discoveries</span>
+            <span class="legend-item"><span class="dot" style="background:#ffcc00"></span>Changes</span>
+            <span class="legend-item"><span class="dot" style="background:#ff3333"></span>Threats</span>
+          </div>
+        </div>
         <div id="view-graph" class="view"><div id="cy"></div>
           <div class="graphbar"><button id="fitBtn">Fit</button><button id="layoutBtn">Re-layout</button>
             <label><input type="checkbox" id="hideLinks" checked> hide search links</label></div></div>
