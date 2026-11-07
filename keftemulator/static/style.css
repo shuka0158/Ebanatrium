@@ -22,15 +22,39 @@ small{font-size:12px}
 .logo{color:var(--accent)}
 .na-icon{
   display:inline-block;
-  background:linear-gradient(135deg, #00ff88 0%, #00dd77 100%);
+  background:#ffffff;
   color:#000000;
+  padding:6px 8px;
+  border:2px solid #000000;
+  border-radius:2px;
+  font-size:10px;
+  margin:0 4px;
+  line-height:1.2;
+  font-family:"IBM Plex Mono",monospace;
+  text-align:center;
+  vertical-align:middle;
+  min-width:45px;
+}
+.na-icon .na-atomic{
+  font-size:9px;
+  color:#666;
+  margin-bottom:1px;
+}
+.na-icon .na-symbol{
+  font-size:18px;
   font-weight:700;
-  padding:2px 6px;
-  border-radius:3px;
-  font-size:12px;
-  margin:0 2px;
-  border:1px solid #00ff88;
-  box-shadow:0 0 8px rgba(0,255,136,0.4);
+  color:#00ff88;
+  line-height:1;
+  margin:2px 0;
+}
+.na-icon .na-name{
+  font-size:9px;
+  font-weight:500;
+  margin:1px 0;
+}
+.na-icon .na-mass{
+  font-size:8px;
+  color:#666;
 }
 nav{display:flex;gap:2px;overflow-x:auto}
 .nav{background:none;border:0;text-decoration:none;padding:8px 14px;border-radius:6px;color:var(--muted)}
