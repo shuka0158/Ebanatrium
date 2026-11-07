@@ -220,6 +220,34 @@ function renderResults() {
     (groups[n.type] ??= []).push(n);
   });
   const types = ORDER.filter(t => groups[t]).concat(Object.keys(groups).filter(t => !ORDER.includes(t)));
+  // Populate categorized results
+  const categorized = {"images": [], "domain": [], "threat": [], "people": [], "media": [], "relationships": [], "intelligence": [], "other": []};
+  Object.values(groups).forEach(grp => grp.forEach(n => {
+    const mod = n.module.toLowerCase();
+    if (mod.includes("image") || mod.includes("screenshot") || mod.includes("exif") || mod.includes("hash") || mod.includes("photo")) categorized.images.push(n);
+    else if (mod.includes("dns") || mod.includes("whois") || mod.includes("email")) categorized.domain.push(n);
+    else if (mod.includes("urlscan") || mod.includes("threat") || mod.includes("virus")) categorized.threat.push(n);
+    else if (mod.includes("phone") || mod.includes("hunter")) categorized.people.push(n);
+    else if (mod.includes("pdf") || mod.includes("video")) categorized.media.push(n);
+    else if (mod.includes("graph") || mod.includes("entity") || mod.includes("link")) categorized.relationships.push(n);
+    else if (mod.includes("timeline") || mod.includes("case") || mod.includes("evidence") || mod.includes("collaboration")) categorized.intelligence.push(n);
+    else categorized.other.push(n);
+  }));
+
+  Object.entries(categorized).forEach(([cat, items]) => {
+    const el = $$(`.category[data-category="${cat}"] .items`)[0];
+    if (!el) return;
+    if (!items.length) { $$(".category")[0].parentElement.querySelector(`[data-category="${cat}"]`).classList.add("empty"); return; }
+    el.innerHTML = items.map(n => {
+      const img = n.data.avatar || n.data.preview;
+      return `<div class="item ${S.sel === n.id ? "sel" : ""}" data-id="${n.id}">
+        ${img ? `<img src="${esc(img)}" alt="" loading="eager" style="max-width: 100%; height: auto; margin-bottom: 8px;">` : ""}
+        <span class="v">${esc(n.label || n.value)}</span><span class="s">${esc(summary(n))}</span>
+        <span class="m">${esc(n.module)}</span></div>`;
+    }).join("");
+  });
+
+  // Keep old resultList for compatibility
   $("#resultList").innerHTML = types.map(t => `<div class="group"><h4><span class="dot" style="background:${col(t)}"></span>${t} · ${groups[t].length}</h4>` +
     groups[t].map(n => {
       const img = n.data.avatar || n.data.preview;
@@ -228,7 +256,9 @@ function renderResults() {
         <span class="v">${esc(n.label || n.value)}</span><span class="s">${esc(summary(n))}</span>
         <span class="m">${esc(n.module)}</span></div>`;
     }).join("") + "</div>").join("") || `<div class="group muted" style="padding:24px">${S.scan.status === "running" ? "Collecting…" : "No results."}</div>`;
-  $$("#resultList .item").forEach(el => el.onclick = () => showDetail(+el.dataset.id));
+
+  // Add click handlers
+  $$(".category .item, #resultList .item").forEach(el => el.onclick = () => showDetail(+el.dataset.id));
   renderEmbeds();
 }
 $("#filter").oninput = renderResults;
