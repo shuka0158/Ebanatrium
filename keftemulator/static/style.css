@@ -1,15 +1,15 @@
 :root{
-  --bg:#0a0005; --panel:#1a0d2e; --panel2:#2d1b47; --line:#3d2b5f; --text:#f0f0ff; --muted:#b8a0d8;
-  --accent:#a855f7; --accent2:#c77dff; --warn:#ff006e; --err:#ff0055; --link:#a855f7;
+  --bg:#0d0d0d; --panel:#1a1a1a; --panel2:#252525; --line:#333333; --text:#e0e0e0; --muted:#888888;
+  --accent:#a855f7; --accent2:#c77dff; --warn:#ff9500; --err:#ff4444; --link:#a855f7;
   --mono:"IBM Plex Mono",ui-monospace,monospace; --sans:"IBM Plex Sans",system-ui,sans-serif;
   --r:8px;
-  --glow-sm: 0 0 10px rgba(168, 85, 247, 0.3);
-  --glow-md: 0 0 20px rgba(168, 85, 247, 0.5);
-  --glow-lg: 0 0 40px rgba(168, 85, 247, 0.7);
+  --glow-sm: 0 0 10px rgba(168, 85, 247, 0.25);
+  --glow-md: 0 0 20px rgba(168, 85, 247, 0.4);
+  --glow-lg: 0 0 40px rgba(168, 85, 247, 0.6);
 }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
-body{background:linear-gradient(135deg, #0a0005 0%, #1a0d2e 100%);color:var(--text);font:14px/1.45 var(--sans);display:flex;flex-direction:column;overflow:hidden;background-attachment:fixed}
+body{background:linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);color:var(--text);font:14px/1.45 var(--sans);display:flex;flex-direction:column;overflow:hidden;background-attachment:fixed}
 a{color:var(--link)}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
