@@ -706,12 +706,9 @@ setInterval(async function checkForAnalysis() {
         const el = $("#ai-analysis-results");
         if (el) {
           el.innerHTML = `<div class="analysis-results" style="white-space: pre-wrap; word-break: break-word;">${esc(data.analysis)}</div>`;
-          console.log("✅ Analysis auto-loaded!");
-          // Auto-switch to AI Analysis tab
-          $$(".tab").forEach(t => t.classList.remove("active"));
-          $$(".tab[data-view='ai-analysis']")[0].classList.add("active");
-          $$(".view").forEach(v => v.classList.add("hidden"));
-          $("#view-ai-analysis").classList.remove("hidden");
+          console.log("✅ Analysis loaded! Click 🧠 AI Analysis tab to view.");
+          // Just load data - don't force tab switch
+          // User can click the tab themselves
         }
       }
     }
