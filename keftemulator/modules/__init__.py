@@ -1,4 +1,4 @@
-"""Module loader for Keftemulator"""
+"""Module loader for Eba[Na]trium"""
 import importlib
 import pkgutil
 from pathlib import Path

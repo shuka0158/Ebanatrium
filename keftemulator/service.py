@@ -67,7 +67,7 @@ def run_monitor(mid):
     if new:
         lines = "\n".join(f"• {n['type']}: {n['label'][:80]}" for n in new[:15])
         more = f"\n…and {len(new) - 15} more" if len(new) > 15 else ""
-        notify(f"Keftemulator: {len(new)} new for {m['target']}", lines + more)
+        notify(f"Eba[Na]trium: {len(new)} new for {m['target']}", lines + more)
 
 
 _running = set()

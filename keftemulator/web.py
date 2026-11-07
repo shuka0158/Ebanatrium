@@ -200,13 +200,13 @@ def _html_report(s, nodes, edges):
     by_type = {}
     for n in nodes:
         by_type.setdefault(n["type"], []).append(n)
-    parts = [f"""<!doctype html><meta charset=utf-8><title>Keftemulator report #{s['id']}</title>
+    parts = [f"""<!doctype html><meta charset=utf-8><title>Eba[Na]trium report #{s['id']}</title>
 <style>body{{font:14px system-ui;margin:2rem auto;max-width:1100px;padding:0 1rem;color:#1b1f24}}
 h1{{margin:0}}table{{border-collapse:collapse;width:100%;margin:.5rem 0 1.5rem}}
 td,th{{border:1px solid #d0d7de;padding:6px 8px;vertical-align:top;text-align:left}}
 th{{background:#f3f4f6}}code{{font-size:12px;white-space:pre-wrap;word-break:break-all}}
 .meta{{color:#57606a}}</style>
-<h1>Keftemulator OSINT report</h1>
+<h1>Eba[Na]trium OSINT report</h1>
 <p class=meta>Target: <b>{e(s['target'])}</b> ({e(s['ttype'])}) · Scan #{s['id']} ·
 {time.strftime('%Y-%m-%d %H:%M', time.localtime(s['created']))} · {len(nodes)} entities · {len(edges)} relations</p>"""]
     if s.get("notes"):
@@ -356,7 +356,7 @@ def api_monitor_events(mid):
 
 @app.post("/api/notify/test")
 def api_notify_test():
-    ok = service.notify("Keftemulator test", "Notifications are working.")
+    ok = service.notify("Eba[Na]trium test", "Notifications are working.")
     return jsonify(ok=ok) if ok else (jsonify(error="set an ntfy topic in Settings first"), 400)
 
 
@@ -465,11 +465,11 @@ def api_install(name):
 
 def main():
     import argparse
-    ap = argparse.ArgumentParser(description="Keftemulator OSINT")
+    ap = argparse.ArgumentParser(description="Eba[Na]trium OSINT")
     ap.add_argument("--host", default="0.0.0.0")
     ap.add_argument("--port", type=int, default=5050)
     a = ap.parse_args()
-    print(f"\n  Keftemulator v{__version__}  →  http://{a.host}:{a.port}\n  data: {DATA}\n", flush=True)
+    print(f"\n  Eba[Na]trium v{__version__}  →  http://{a.host}:{a.port}\n  data: {DATA}\n", flush=True)
     if auth.password_hash() is None:
         print("  WARNING: no password set — run `keft password`\n", flush=True)
     service.start_scheduler()

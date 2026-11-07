@@ -1,6 +1,6 @@
 /**
  * Image Proxy UI Enhancement
- * Displays images fetched by the Image Proxy in Keftemulator web UI
+ * Displays images fetched by the Image Proxy in Eba[Na]trium web UI
  */
 
 (function() {

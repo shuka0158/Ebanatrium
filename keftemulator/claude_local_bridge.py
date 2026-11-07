@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Direct Claude Bridge - Auto-submits analysis to Keftemulator
+Direct Claude Bridge - Auto-submits analysis to Eba[Na]trium
 100% AUTOMATIC - NO MANUAL STEPS
 """
 
@@ -12,7 +12,7 @@ from datetime import datetime
 ANALYSIS_FILE = "/media/mount/Keftemulator/data/ai_analysis/pending.json"
 
 class DirectClaudeHandler(BaseHTTPRequestHandler):
-    """Direct bridge - auto-submit to Keftemulator"""
+    """Direct bridge - auto-submit to Eba[Na]trium"""
     
     def do_OPTIONS(self):
         """Handle CORS preflight"""
@@ -124,7 +124,7 @@ def run_bridge(port=7778):
     print("=" * 60)
     print(f"\n✅ Listening on: http://0.0.0.0:{port}")
     print("✅ Auto-polling: http://localhost:7778/check")
-    print("✅ Analysis auto-displays in Keftemulator\n")
+    print("✅ Analysis auto-displays in Eba[Na]trium\n")
     
     server = HTTPServer(("0.0.0.0", port), DirectClaudeHandler)
     

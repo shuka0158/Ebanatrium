@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Local Claude Tunnel - Connect Keftemulator to Claude directly
+Local Claude Tunnel - Connect Eba[Na]trium to Claude directly
 No API costs - Uses your existing Claude subscription
 Smart fallback: Opus → Sonnet → Haiku
 """
@@ -21,7 +21,7 @@ class ClaudeTunnelHandler(BaseHTTPRequestHandler):
     ]
     
     def do_POST(self):
-        """Handle POST requests from Keftemulator"""
+        """Handle POST requests from Eba[Na]trium"""
         
         if self.path == "/analyze":
             content_length = int(self.headers.get('Content-Length', 0))
@@ -120,7 +120,7 @@ def run_tunnel(port=7777):
     print("  1️⃣ Claude Opus (most powerful)")
     print("  2️⃣ Claude Sonnet (good balance)")
     print("  3️⃣ Claude Haiku (fast)")
-    print("\nKeftemulator will POST to: /analyze")
+    print("\nEba[Na]trium will POST to: /analyze")
     print("\nEndpoint: http://localhost:{port}/analyze")
     print("\n" + "=" * 50 + "\n")
     
