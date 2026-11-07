@@ -101,6 +101,7 @@
       <div class="tabs">
         <button class="tab active" data-view="results">Results</button>
         <button class="tab" data-view="timeline">Timeline</button>
+            <button class="tab" data-view="ai-analysis">🧠 AI Analysis</button>
         <button class="tab" data-view="graph">Graph</button>
         <button class="tab" data-view="map">Map</button>
         <button class="tab" data-view="log">Log</button>
@@ -133,6 +134,17 @@
         <div id="view-graph" class="view"><div id="cy"></div>
           <div class="graphbar"><button id="fitBtn">Fit</button><button id="layoutBtn">Re-layout</button>
             <label><input type="checkbox" id="hideLinks" checked> hide search links</label></div></div>
+        <div id="view-ai-analysis" class="view">
+          <div class="analysis-container">
+            <div class="analysis-header">
+              <h3>🧠 Deep AI Analysis</h3>
+              <p class="analysis-subtitle">Comprehensive intelligence synthesis of all findings</p>
+            </div>
+            <div class="analysis-content">
+              <div id="ai-analysis-results" class="analysis-results"></div>
+            </div>
+          </div>
+        </div>
         <div id="view-map" class="view"><div id="map"></div></div>
         <div id="view-log" class="view"><pre id="log"></pre></div>
         <div id="view-notes" class="view"><textarea id="notes" placeholder="Analyst notes (saved with the scan, included in the report)"></textarea></div>
