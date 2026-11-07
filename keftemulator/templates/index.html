@@ -149,7 +149,10 @@
 <!-- ===================================================== SCANS -->
 <main id="page-scans" class="page">
   <div class="pagewrap">
-    <h2>Scan history</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h2 style="margin:0">Scan history</h2>
+      <button id="clearScansBtn" class="danger" style="padding:8px 16px" title="Delete all scan history">Clear all</button>
+    </div>
     <table class="tbl"><thead><tr><th>#</th><th>Target</th><th>Type</th><th>Status</th><th>Entities</th><th>Started</th><th></th></tr></thead>
       <tbody id="scanRows"></tbody></table>
   </div>

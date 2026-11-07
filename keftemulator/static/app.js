@@ -423,6 +423,18 @@ async function loadScans() {
     `<tr><td colspan=7 class="muted">No scans yet.</td></tr>`;
   $$("[data-open]").forEach(a => a.onclick = e => { e.preventDefault(); openScan(+a.dataset.open); });
   $$("[data-del]").forEach(b => b.onclick = async () => { if (confirm("Delete scan #" + b.dataset.del + "?")) { await api(`/api/scans/${b.dataset.del}`, { method: "DELETE" }); loadScans(); } });
+
+  // Clear all scans button
+  const clearBtn = $("#clearScansBtn");
+  if (clearBtn) {
+    clearBtn.onclick = async () => {
+      if (!rows.length) { alert("No scans to clear"); return; }
+      if (!confirm("Delete ALL " + rows.length + " scans? This cannot be undone.")) return;
+      for (const s of rows) await api(`/api/scans/${s.id}`, { method: "DELETE" });
+      toast("✅ All scans cleared");
+      loadScans();
+    };
+  }
 }
 
 /* ------------------------------------------------------------- modules page */
