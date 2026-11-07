@@ -249,10 +249,11 @@ function renderResults() {
     return typeHeader + "\n" + typeResults;
   }).join("\n\n");
 
-  $("#resultList").textContent = plainTextResults || (S.scan.status === "running" ? "Collecting…" : "No results.");
+  const resultList = $("#resultList");
+  if (resultList) {
+    resultList.textContent = plainTextResults || (S.scan.status === "running" ? "Collecting…" : "No results.");
+  }
 
-  // Add click handlers
-  $$(".category .item, #resultList .item").forEach(el => el.onclick = () => showDetail(+el.dataset.id));
   renderEmbeds();
 
   // Auto-trigger AI analysis if results exist
