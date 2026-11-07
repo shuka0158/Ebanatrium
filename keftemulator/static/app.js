@@ -223,27 +223,40 @@ function renderResults() {
   // Populate categorized results
   const categorized = {"images": [], "domain": [], "threat": [], "people": [], "media": [], "relationships": [], "intelligence": [], "other": []};
   Object.values(groups).forEach(grp => grp.forEach(n => {
-    const mod = n.module.toLowerCase();
-    if (mod.includes("image") || mod.includes("screenshot") || mod.includes("exif") || mod.includes("hash") || mod.includes("photo")) categorized.images.push(n);
-    else if (mod.includes("dns") || mod.includes("whois") || mod.includes("email")) categorized.domain.push(n);
-    else if (mod.includes("urlscan") || mod.includes("threat") || mod.includes("virus")) categorized.threat.push(n);
-    else if (mod.includes("phone") || mod.includes("hunter")) categorized.people.push(n);
-    else if (mod.includes("pdf") || mod.includes("video")) categorized.media.push(n);
-    else if (mod.includes("graph") || mod.includes("entity") || mod.includes("link")) categorized.relationships.push(n);
-    else if (mod.includes("timeline") || mod.includes("case") || mod.includes("evidence") || mod.includes("collaboration")) categorized.intelligence.push(n);
+    const mod = (n.module || "").toLowerCase();
+    const type = (n.type || "").toLowerCase();
+
+    if (mod.includes("image") || mod.includes("screenshot") || mod.includes("exif") || mod.includes("hash") || mod.includes("photo") || type.includes("image")) categorized.images.push(n);
+    else if (mod.includes("dns") || mod.includes("whois") || mod.includes("domain") || mod.includes("email") || type === "email_address") categorized.domain.push(n);
+    else if (mod.includes("urlscan") || mod.includes("threat") || mod.includes("virus") || mod.includes("abuse") || mod.includes("malware")) categorized.threat.push(n);
+    else if (mod.includes("phone") || mod.includes("hunter") || mod.includes("sherlock") || type === "phone") categorized.people.push(n);
+    else if (mod.includes("pdf") || mod.includes("video") || mod.includes("media")) categorized.media.push(n);
+    else if (mod.includes("graph") || mod.includes("entity") || mod.includes("relationship") || mod.includes("family")) categorized.relationships.push(n);
+    else if (mod.includes("timeline") || mod.includes("case") || mod.includes("evidence") || mod.includes("court") || mod.includes("intelligence")) categorized.intelligence.push(n);
     else categorized.other.push(n);
   }));
 
   Object.entries(categorized).forEach(([cat, items]) => {
     const el = $$(`.category[data-category="${cat}"] .items`)[0];
     if (!el) return;
-    if (!items.length) { $$(".category")[0].parentElement.querySelector(`[data-category="${cat}"]`).classList.add("empty"); return; }
+
+    if (!items.length) {
+      const catEl = document.querySelector(`[data-category="${cat}"]`);
+      if (catEl) catEl.classList.add("empty");
+      el.innerHTML = "";
+      return;
+    }
+
     el.innerHTML = items.map(n => {
       const img = n.data.avatar || n.data.preview;
-      return `<div class="item ${S.sel === n.id ? "sel" : ""}" data-id="${n.id}">
+      const label = n.label || n.value || "Unknown";
+      const mod = n.module || "Unknown";
+      return `<div class="item ${S.sel === n.id ? "sel" : ""}" data-id="${n.id}" style="padding: 12px; border: 1px solid #333; border-radius: 4px; margin-bottom: 8px; background: #1a1a1a; cursor: pointer;">
         ${img ? `<img src="${esc(img)}" alt="" loading="eager" style="max-width: 100%; height: auto; margin-bottom: 8px;">` : ""}
-        <span class="v">${esc(n.label || n.value)}</span><span class="s">${esc(summary(n))}</span>
-        <span class="m">${esc(n.module)}</span></div>`;
+        <div class="v" style="color: #fff; font-weight: bold;">${esc(label)}</div>
+        <div class="s" style="color: #888; font-size: 12px; margin-top: 4px;">${esc(summary(n))}</div>
+        <div class="m" style="color: #666; font-size: 11px; margin-top: 4px;">📌 ${esc(mod)}</div>
+      </div>`;
     }).join("");
   });
 
