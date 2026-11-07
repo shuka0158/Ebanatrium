@@ -2,6 +2,10 @@
 
 **Eba[Na]trium** - Advanced Open Source Intelligence (OSINT) platform for deep intelligence gathering.
 
+## 🤝 Contributing
+
+Hey guys, I really wanna make this OSINT powerful and max it out, so if anyone has recommendations about what to add/change, or if you want to contribute, please feel free to open an issue, pull request, or message me on Discord: **@shuka0158**
+
 ## Features
 
 - 🔍 **7 Active OSINT Modules** with real data extraction
