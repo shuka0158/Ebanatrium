@@ -13,6 +13,14 @@ import sys
 class DirectClaudeHandler(BaseHTTPRequestHandler):
     """Direct bridge to Claude running in this terminal"""
     
+    def do_OPTIONS(self):
+        """Handle CORS preflight"""
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
+    
     def do_POST(self):
         """Handle analysis requests directly from Keftemulator"""
         
@@ -46,7 +54,6 @@ Include: identification, relationships, risks, findings, vectors, patterns, summ
                 print("=" * 60)
                 print("\n(Claude will provide analysis via terminal - please respond)\n")
                 
-                # For now, return a placeholder that Keftemulator expects
                 result = {
                     "success": True,
                     "model": "claude-local",
@@ -57,6 +64,9 @@ Include: identification, relationships, risks, findings, vectors, patterns, summ
                 
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+                self.send_header('Access-Control-Allow-Headers', 'Content-Type')
                 self.end_headers()
                 self.wfile.write(json.dumps(result).encode())
                 
@@ -84,7 +94,7 @@ def run_bridge(port=7778):
     print("\n🎯 Cost: ZERO (local connection only)")
     print("\n" + "=" * 60 + "\n")
     
-    server = HTTPServer(("localhost", port), DirectClaudeHandler)
+    server = HTTPServer(("0.0.0.0", port), DirectClaudeHandler)
     print("✅ Bridge ready! Listening for Keftemulator requests...\n")
     
     try:
