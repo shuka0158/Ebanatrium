@@ -2,6 +2,8 @@
 
 import requests
 import json
+import os
+from keftemulator.config import MALTEGO_EMAIL, MALTEGO_API_KEY
 
 class MaltegoBridge:
     name = "Maltego Intelligence Bridge"
@@ -10,19 +12,25 @@ class MaltegoBridge:
     
     def __init__(self):
         self.api_url = "https://api.maltego.com/api/v1"
-        # Credentials should be stored in environment variables:
-        # MALTEGO_EMAIL and MALTEGO_API_KEY
-        self.api_key = None
+        self.email = MALTEGO_EMAIL
+        self.api_key = MALTEGO_API_KEY
         
     def investigate(self, target, ctx):
         """Send target to Maltego for investigation"""
         try:
+            if not self.email or not self.api_key:
+                ctx.emit("link", "Maltego Configuration Required", 
+                        "Set MALTEGO_EMAIL and MALTEGO_API_KEY in .env file",
+                        {"status": "not_configured"},
+                        rel="maltego_config")
+                return
+            
             ctx.emit("status", f"Sending to Maltego: {target}")
             
             # Create Maltego graph/entity
             ctx.emit("link", "Maltego Investigation", 
                     f"Target sent to Maltego for analysis: {target}",
-                    {"target": target, "service": "maltego"},
+                    {"target": target, "service": "maltego", "email": self.email},
                     rel="maltego_bridge")
             
             ctx.emit("link", "Maltego Web UI",
