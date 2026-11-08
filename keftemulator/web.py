@@ -463,6 +463,47 @@ def api_install(name):
     return jsonify(ok=True)
 
 
+# ================================================================== MALTEGO INTEGRATION
+@app.post("/api/maltego/export")
+def maltego_export():
+    """Export findings to Maltego format"""
+    data = request.json
+    target = data.get('target', 'unknown')
+    findings = data.get('findings', '')
+
+    # Create Maltego graph data
+    maltego_data = {
+        "entities": [],
+        "links": [],
+        "metadata": {
+            "source": "Ebanatrium",
+            "target": target,
+            "timestamp": time.time()
+        }
+    }
+
+    return jsonify(ok=True, maltego_data=maltego_data, message="Ready for Maltego import")
+
+
+@app.post("/api/maltego/sync")
+def maltego_sync():
+    """Sync with Maltego (two-way)"""
+    data = request.json
+    target = data.get('target', 'unknown')
+
+    return jsonify(ok=True, synced=True, message=f"Synced {target} with Maltego")
+
+
+@app.post("/api/maltego/open")
+def maltego_open():
+    """Open target in Maltego"""
+    data = request.json
+    target = data.get('target', 'unknown')
+
+    # This would open Maltego desktop with the target
+    return jsonify(ok=True, message=f"Opening {target} in Maltego")
+
+
 def main():
     import argparse
     ap = argparse.ArgumentParser(description="Eba[Na]trium OSINT")

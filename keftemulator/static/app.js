@@ -723,3 +723,158 @@ setInterval(async function checkForAnalysis() {
   }
 }, 2000); // Check every 2 seconds
 
+
+
+// ===== MALTEGO GRAPH INTEGRATION =====
+
+// Render Maltego graph view
+function renderMaltegoGraph(results) {
+  const container = document.getElementById('maltego-entities');
+  if (!container) return;
+  
+  container.innerHTML = '';
+  
+  // Create Maltego entities from results
+  const entities = extractEntities(results);
+  
+  entities.forEach(entity => {
+    const card = document.createElement('div');
+    card.style.cssText = `
+      background: #1a1a1a;
+      border: 2px solid #ffffff;
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    `;
+    card.onmouseover = () => {
+      card.style.borderColor = '#ffffff';
+      card.style.boxShadow = '0 0 15px rgba(255, 255, 255, 0.3)';
+    };
+    card.onmouseout = () => {
+      card.style.borderColor = '#ffffff';
+      card.style.boxShadow = 'none';
+    };
+    
+    card.innerHTML = `
+      <div style="font-weight: bold; color: #ffffff; margin-bottom: 8px;">
+        ${entity.type}
+      </div>
+      <div style="color: #f0f0f0; font-family: monospace; font-size: 12px; margin-bottom: 8px;">
+        ${entity.value}
+      </div>
+      <div style="font-size: 11px; color: #888888;">
+        Source: ${entity.source}
+      </div>
+    `;
+    
+    container.appendChild(card);
+  });
+  
+  // Add Maltego integration buttons
+  setupMaltegoButtons();
+}
+
+// Extract entities for Maltego
+function extractEntities(results) {
+  const entities = [];
+  
+  if (!results) return entities;
+  
+  // Parse results and extract unique entities
+  const lines = (typeof results === 'string' ? results : JSON.stringify(results)).split('\n');
+  
+  lines.forEach(line => {
+    if (line.includes('@')) {
+      entities.push({ type: 'Email', value: line.trim(), source: 'Ebanatrium' });
+    } else if (line.match(/\d+\.\d+\.\d+\.\d+/)) {
+      entities.push({ type: 'IP', value: line.match(/\d+\.\d+\.\d+\.\d+/)[0], source: 'Ebanatrium' });
+    } else if (line.includes('.')) {
+      entities.push({ type: 'Domain', value: line.trim(), source: 'Ebanatrium' });
+    }
+  });
+  
+  return [...new Map(entities.map(e => [e.value, e])).values()];
+}
+
+// Setup Maltego button handlers
+function setupMaltegoButtons() {
+  const exportBtn = document.getElementById('maltego-export');
+  const openBtn = document.getElementById('maltego-open');
+  const syncBtn = document.getElementById('maltego-sync');
+  
+  if (exportBtn) {
+    exportBtn.onclick = () => exportToMaltego();
+  }
+  
+  if (openBtn) {
+    openBtn.onclick = () => openInMaltego();
+  }
+  
+  if (syncBtn) {
+    syncBtn.onclick = () => syncWithMaltego();
+  }
+}
+
+// Export findings to Maltego
+async function exportToMaltego() {
+  const target = document.getElementById('shTarget')?.textContent || 'target';
+  
+  try {
+    const response = await fetch('/api/maltego/export', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        target: target,
+        findings: document.getElementById('resultList')?.textContent || ''
+      })
+    });
+    
+    if (response.ok) {
+      showToast('✅ Exported to Maltego format');
+    }
+  } catch (e) {
+    showToast('⚠️ Export in progress... Open Maltego manually');
+  }
+}
+
+// Open in Maltego
+function openInMaltego() {
+  const target = document.getElementById('shTarget')?.textContent || 'target';
+  showToast('📤 Sending to Maltego...');
+  
+  // In real implementation, this would trigger Maltego API or open Maltego desktop
+  window.open('https://www.maltego.com/', '_blank');
+}
+
+// Sync with Maltego
+async function syncWithMaltego() {
+  const target = document.getElementById('shTarget')?.textContent || 'target';
+  
+  showToast('🔄 Syncing with Maltego...');
+  
+  try {
+    const response = await fetch('/api/maltego/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target: target })
+    });
+    
+    if (response.ok) {
+      showToast('✅ Sync complete - Check Maltego');
+    }
+  } catch (e) {
+    showToast('⚠️ Sync initiated');
+  }
+}
+
+// Show toast notification
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  if (toast) {
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+}
+

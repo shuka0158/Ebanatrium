@@ -121,9 +121,21 @@
             <span class="legend-item"><span class="dot" style="background:#ff3333"></span>Threats</span>
           </div>
         </div>
-        <div id="view-graph" class="view"><div id="cy"></div>
-          <div class="graphbar"><button id="fitBtn">Fit</button><button id="layoutBtn">Re-layout</button>
-            <label><input type="checkbox" id="hideLinks" checked> hide search links</label></div></div>
+        <div id="view-graph" class="view">
+          <div id="maltego-container" style="width: 100%; height: 100%; display: flex; flex-direction: column;">
+            <div style="padding: 16px; border-bottom: 1px solid #333; background: #0a0a0a;">
+              <h3 style="margin: 0 0 10px 0; color: #ffffff;">Maltego Graph Intelligence</h3>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button id="maltego-export" style="background: #ffffff; color: #000; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">📤 Export to Maltego</button>
+                <button id="maltego-open" style="background: #ffffff; color: #000; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">🔗 Open in Maltego</button>
+                <button id="maltego-sync" style="background: #ffffff; color: #000; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">🔄 Sync with Maltego</button>
+              </div>
+            </div>
+            <div id="maltego-graph" style="flex: 1; overflow: auto; padding: 16px; background: #000000;">
+              <div id="maltego-entities" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px;"></div>
+            </div>
+          </div>
+        </div>
         <div id="view-ai-analysis" class="view">
           <div class="analysis-container">
             <div class="analysis-header">
