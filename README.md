@@ -38,7 +38,7 @@ Eba[Na]trium (port 5052)
 ## Installation
 
 ```bash
-cd /media/mount/Keftemulator
+cd /media/mount/Ebanatrium
 systemctl --user start ebanatrium.service
 ```
 
