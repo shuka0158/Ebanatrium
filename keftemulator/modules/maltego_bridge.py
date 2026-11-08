@@ -10,9 +10,9 @@ class MaltegoBridge:
     
     def __init__(self):
         self.api_url = "https://api.maltego.com/api/v1"
-        self.email = "shuka0158@gmail.com"
-        # Note: Password should be stored securely in environment variable
-        self.api_key = None  # Will be set from environment
+        # Credentials should be stored in environment variables:
+        # MALTEGO_EMAIL and MALTEGO_API_KEY
+        self.api_key = None
         
     def investigate(self, target, ctx):
         """Send target to Maltego for investigation"""
